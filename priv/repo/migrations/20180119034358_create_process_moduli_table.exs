@@ -1,12 +1,7 @@
 defmodule BatchProcessCoordination.Repo.Migrations.CreateProcessModuliTable do
-  
   use Ecto.Migration
 
-  
-  
   def change do
-
-
     create table(:process_moduli) do
       add :process_name,       :string
       add :remainder,          :integer
@@ -17,5 +12,4 @@ defmodule BatchProcessCoordination.Repo.Migrations.CreateProcessModuliTable do
       timestamps()
     end
   end
-
 end
