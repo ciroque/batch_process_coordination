@@ -114,10 +114,9 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceTest do
     end
 
     test "multiple batch keys in flight simulataneously" do
-      length = length(ProcessMaintenance.register_process(@first_process_name))
-      range = 1..length
+      {:ok, %{key_space_size: key_space_size}} = ProcessMaintenance.register_process(@first_process_name)
 
-      batch_keys = range
+      batch_keys = 1..key_space_size
       |> Enum.map(
         fn n ->
           {:ok, _} = BatchKeyMaintenance.request_batch_key(@first_process_name, @base_machine_name <> "-#{n}")
@@ -138,9 +137,9 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceTest do
 
     test "list_batch_keys returns correct list for process" do
       ProcessMaintenance.register_process(@first_process_name)
-      length = length(ProcessMaintenance.register_process(@second_process_name))
+      {:ok, %{key_space_size: key_space_size}} = ProcessMaintenance.register_process(@second_process_name)
 
-      assert length(BatchKeyMaintenance.list_batch_keys(@second_process_name)) === length
+      assert length(BatchKeyMaintenance.list_batch_keys(@second_process_name)) === key_space_size
     end
   end
 end
