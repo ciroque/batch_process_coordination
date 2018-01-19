@@ -20,6 +20,10 @@ defmodule BatchProcessCoordination.ProcessMaintenanceTest do
       assert key_space_size === key_space_size
     end
 
+    test "Unregister unknown Process returns :not_found" do
+      {:not_found} = ProcessMaintenance.unregister_process("UNKNOWN")
+    end
+
     test "Unregister Process deletes all batch keys" do
       {:ok, %{key_space_size: registered_key_space_size}} =  ProcessMaintenance.register_process("test one process")
       {:ok, %{key_space_size: unregistered_key_space_size}} = ProcessMaintenance.unregister_process("test one process")
