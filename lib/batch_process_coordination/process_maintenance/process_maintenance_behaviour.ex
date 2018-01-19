@@ -9,7 +9,7 @@ defmodule BatchProcessCoordination.ProcessMaintenanceBehaviour do
 
   @callback register_process(process_name_t, key_space_t) :: {:ok, process_info_t} | {:error, map()}
 
-  @callback unregister_process(process_name_t) :: {:ok} | {:error, map()}
+  @callback unregister_process(process_name_t) :: {:ok, process_info_t} | {:error, map()}
 
   @callback list_processes() :: {:ok, list(process_info_t)}
 end

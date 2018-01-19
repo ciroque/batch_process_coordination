@@ -21,9 +21,9 @@ defmodule BatchProcessCoordination.ProcessMaintenanceTest do
     end
 
     test "Unregister Process deletes all batch keys" do
-      {:ok, %{key_space_size: key_space_size}} =  ProcessMaintenance.register_process("test one process")
-      {deleted, _} = ProcessMaintenance.unregister_process("test one process")
-      assert key_space_size === deleted
+      {:ok, %{key_space_size: registered_key_space_size}} =  ProcessMaintenance.register_process("test one process")
+      {:ok, %{key_space_size: unregistered_key_space_size}} = ProcessMaintenance.unregister_process("test one process")
+      assert registered_key_space_size === unregistered_key_space_size
     end
 
     test "list_processes returns empty list when nothing is preset" do

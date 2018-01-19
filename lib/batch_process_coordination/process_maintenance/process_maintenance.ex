@@ -23,8 +23,10 @@ defmodule BatchProcessCoordination.ProcessMaintenance do
   end
 
   def unregister_process(process_name) do
-    (from pm in ProcessBatchKeys, where: pm.process_name == ^process_name)
+    {count, _} = (from pm in ProcessBatchKeys, where: pm.process_name == ^process_name)
     |> Repo.delete_all()
+
+    {:ok, %{process_name: process_name, key_space_size: count}}
   end
 
   def list_processes() do
