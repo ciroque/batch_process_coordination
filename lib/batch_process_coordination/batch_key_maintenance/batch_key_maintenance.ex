@@ -12,7 +12,7 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
     query =
     (
       from pm in ProcessBatchKeys,
-      join: batch_key in subquery(claim_next_batch_key_for(process_name, machine)),
+      join: batch_key in subquery(claim_next_batch_key_for(process_name)),
         on: batch_key.id == pm.id
     )
 
@@ -21,7 +21,9 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
         Logger.info("#{__MODULE__}::request_batch_key All keys in use")
         {:no_keys_free}
       {1, [%{key: key, machine: machine, process_name: process_name, started_at: started_at}]} ->
-        {:ok, %{key: key, machine: machine, process_name: process_name, started_at: started_at}}
+        result = {:ok, %{key: key, machine: machine, process_name: process_name, started_at: started_at}}
+        Logger.info("#{__MODULE__}::request_batch_key Result: #{inspect(result)}")
+        result
       r ->
         log_key = Ecto.UUID.generate()
         Logger.error("#{__MODULE__}::request_batch_key [log_key: #{log_key}] Unexpected result from update query: #{inspect(r)}")
@@ -35,6 +37,7 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
       where: 1 == 1
         and pm.process_name == ^process_name
         and pm.key == ^key
+        and pm.machine == ^machine
         and not is_nil(pm.started_at)
     )
     update = [set: [machine: nil, started_at: nil, last_completed_at: Timex.now()]]
@@ -48,7 +51,7 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
           machine: machine,
           process_name: process_name,
           started_at: started_at,
-          last_completed_at: last_completed_at
+          completed_at: last_completed_at
         }}
       r ->
         log_key = Ecto.UUID.generate()
@@ -83,7 +86,7 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
     )
   end
 
-  defp claim_next_batch_key_for(process_name, _machine) do
+  defp claim_next_batch_key_for(process_name) do
     (
       from pm in ProcessBatchKeys,
       join: batch_keys in subquery(first_batch_key_for(process_name)),

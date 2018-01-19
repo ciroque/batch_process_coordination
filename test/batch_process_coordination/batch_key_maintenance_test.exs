@@ -7,7 +7,8 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceTest do
 
   @first_process_name "BPC-Test-Process-1"
   @second_process_name "BPC-Test-Process-2"
-  @machine_one_name "BPC-Test-Machine-1"
+  @base_machine_name "BPC-Test-Machine"
+  @machine_one_name @base_machine_name <> "-1"
 
   describe "BatchKeyMaintenance" do
     def setup do
@@ -68,6 +69,67 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceTest do
       assert key === 0
       assert machine === @machine_one_name
       assert process_name === @first_process_name
+    end
+
+    test "release_batch_key for unknown combo returns :not_found" do
+      unknown_batch_key = %{
+        process_name: "UNKNOWN",
+        machine: "UNKNOWN",
+        key: -1,
+        started_at: Timex.now
+      }
+
+      assert {:not_found} === BatchKeyMaintenance.release_batch_key(unknown_batch_key)
+    end
+
+    test "release_batch_key for previously released combo results in :not_found" do
+      ProcessMaintenance.register_process(@first_process_name)
+      {:ok, batch_key} = BatchKeyMaintenance.request_batch_key(@first_process_name, @machine_one_name)
+
+      {:ok, _} = BatchKeyMaintenance.release_batch_key(batch_key)
+      assert {:not_found} === BatchKeyMaintenance.release_batch_key(batch_key)
+      assert {:not_found} === BatchKeyMaintenance.release_batch_key(batch_key)
+    end
+
+    test "release_batch_key succeeds" do
+      ProcessMaintenance.register_process(@first_process_name)
+      {:ok, batch_key} = BatchKeyMaintenance.request_batch_key(@first_process_name, @machine_one_name)
+
+      {:ok, %{key: key, machine: machine, process_name: process_name, completed_at: completed_at}} = BatchKeyMaintenance.release_batch_key(batch_key)
+
+      assert key === 0
+      assert machine === @machine_one_name
+      assert process_name === @first_process_name
+      assert completed_at !== nil
+    end
+
+    test "paired requests / releases work correctly" do
+      ProcessMaintenance.register_process(@second_process_name)
+
+      for n <- 0..127 do
+        {:ok, batch_key} = BatchKeyMaintenance.request_batch_key(@second_process_name, @base_machine_name <> "-#{n}")
+        {:ok, released} = BatchKeyMaintenance.release_batch_key(batch_key)
+        assert batch_key.key === released.key
+      end
+    end
+
+    test "multiple batch keys in flight simulataneously" do
+      length = length(ProcessMaintenance.register_process(@first_process_name))
+      range = 1..length
+
+      batch_keys = range
+      |> Enum.map(
+        fn n ->
+          {:ok, _} = BatchKeyMaintenance.request_batch_key(@first_process_name, @base_machine_name <> "-#{n}")
+        end
+      )
+
+      batch_keys
+      |> Enum.map(
+        fn {:ok, batch_key} ->
+          {:ok, _} = BatchKeyMaintenance.release_batch_key(batch_key)
+        end
+      )
     end
   end
 end
