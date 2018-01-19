@@ -20,8 +20,8 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
       {0, []} ->
         Logger.info("#{__MODULE__}::request_batch_key All keys in use")
         {:no_keys_free}
-      {1, [%{remainder: remainder, machine: machine, process_name: process_name, started_at: started_at}]} ->
-        {:ok, %{remainder: remainder, machine: machine, process_name: process_name, started_at: started_at}}
+      {1, [%{key: key, machine: machine, process_name: process_name, started_at: started_at}]} ->
+        {:ok, %{key: key, machine: machine, process_name: process_name, started_at: started_at}}
       r ->
         log_key = Ecto.UUID.generate()
         Logger.error("#{__MODULE__}::request_batch_key [log_key: #{log_key}] Unexpected result from update query: #{inspect(r)}")
@@ -45,26 +45,26 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
         and is_nil(pm.machine)
         and pm.process_name == ^process_name,
       select: %{
-      remainder: pm.remainder,
-      row_number: fragment("row_number() over (order by last_completed_at)")
+        key: pm.key,
+        row_number: fragment("row_number() over (order by last_completed_at)")
       }
-      )
+    )
   end
 
-  defp first_remainder_for(process_name) do
+  defp first_batch_key_for(process_name) do
     (
       from r in subquery(batch_keys_for(process_name)),
       where: r.row_number < 2,
-      select: r.remainder
-      )
+      select: r.key
+    )
   end
 
   defp claim_next_batch_key_for(process_name, _machine) do
     (
       from pm in ProcessBatchKeys,
-      join: remainder in subquery(first_remainder_for(process_name)),
-        on: remainder.remainder == pm.remainder,
+      join: batch_keys in subquery(first_batch_key_for(process_name)),
+        on: batch_keys.key == pm.key,
       where: pm.process_name == ^process_name
-      )
+    )
   end
 end
