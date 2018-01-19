@@ -6,7 +6,11 @@ jobs:
   build:
     docker:
       # specify the version here
-      - image: circleci/elixir:1.4
+      # - image: circleci/elixir:1.4
+      - image: ciroque/phoenix-apps-build
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
