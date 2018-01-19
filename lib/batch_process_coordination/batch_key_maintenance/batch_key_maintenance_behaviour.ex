@@ -8,14 +8,15 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceBehaviour do
     key: integer(),
     machine: String.t,
     process_name: String.t,
-    started_at: Timex.DateTime.t
+    started_at: Timex.DateTime.t,
+    completed_at: Timex.DateTime.t
   }
 
   alias BatchProcessCoordination.ProcessBatchKeys
 
   @callback request_batch_key(process_name_t, machine_name_t) :: {:ok, batch_key_result_t} | {:error, map()} | {:error, String.t}
 
-  @callback release_batch_key(process_name_t, key_t) :: {:ok, last_completed_at_t} | {:error, map()}
+  @callback release_batch_key(batch_key_result_t) :: {:ok, batch_key_result_t} | {:error, map()}
 
   @callback list_batch_keys(process_name_t) :: list(ProcessBatchKeys.t)
 end

@@ -29,8 +29,32 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
     end
   end
 
-  def release_batch_key(_process_name, _modulus) do
-    {:ok, ""}
+  def release_batch_key(%{key: key, machine: machine, process_name: process_name, started_at: started_at}) do
+    query = (
+      from pm in ProcessBatchKeys,
+      where: 1 == 1
+        and pm.process_name == ^process_name
+        and pm.key == ^key
+        and not is_nil(pm.started_at)
+    )
+    update = [set: [machine: nil, started_at: nil, last_completed_at: Timex.now()]]
+    case query |> Repo.update_all(update, [returning: true]) do
+      {0, []} ->
+        Logger.info("#{__MODULE__}::release_batch_key Attempt to release unknown key; process_name: #{process_name}, machine: #{machine}, key: #{key}")
+        {:not_found}
+      {1, [%{last_completed_at: last_completed_at}]} ->
+        {:ok, %{
+          key: key,
+          machine: machine,
+          process_name: process_name,
+          started_at: started_at,
+          last_completed_at: last_completed_at
+        }}
+      r ->
+        log_key = Ecto.UUID.generate()
+        Logger.error("#{__MODULE__}::release_batch_key [log_key: #{log_key}] Unexpected result from update query: #{inspect(r)}")
+        {:error, "An error occured. Please review the logs for details. Log key: #{log_key}"}
+    end
   end
 
   def list_batch_keys(_process_name) do
