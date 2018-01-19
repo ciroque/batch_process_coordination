@@ -41,5 +41,10 @@ defmodule BatchProcessCoordination.ProcessMaintenanceTest do
         %{key_space_size: 10, process_name: "one"},
       ]}
     end
+
+    test "regstering duplicate process_name is disallowed" do
+      {:ok, _} =  ProcessMaintenance.register_process("NO-DUPLICATES-ALLOWED")
+      {:name_already_exists} = ProcessMaintenance.register_process("NO-DUPLICATES-ALLOWED")
+    end
   end
 end

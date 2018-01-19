@@ -7,7 +7,7 @@ defmodule BatchProcessCoordination.ProcessMaintenanceBehaviour do
     key_space_size: integer()
   }
 
-  @callback register_process(process_name_t, key_space_t) :: {:ok, process_info_t} | {:error, map()}
+  @callback register_process(process_name_t, key_space_t) :: {:ok, process_info_t} | {:name_already_exists} | {:error, map()}
 
   @callback unregister_process(process_name_t) :: {:ok, process_info_t} | {:error, map()}
 
