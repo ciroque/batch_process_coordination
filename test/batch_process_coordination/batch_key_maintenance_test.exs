@@ -131,5 +131,16 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceTest do
         end
       )
     end
+
+    test "list_batch_keys returns empty list for unknown process" do
+      assert BatchKeyMaintenance.list_batch_keys("UNKNOWN") === []
+    end
+
+    test "list_batch_keys returns correct list for process" do
+      ProcessMaintenance.register_process(@first_process_name)
+      length = length(ProcessMaintenance.register_process(@second_process_name))
+
+      assert length(BatchKeyMaintenance.list_batch_keys(@second_process_name)) === length
+    end
   end
 end

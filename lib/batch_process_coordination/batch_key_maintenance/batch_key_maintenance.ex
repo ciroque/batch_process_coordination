@@ -60,8 +60,8 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
     end
   end
 
-  def list_batch_keys(_process_name) do
-    []
+  def list_batch_keys(process_name) do
+    (from pm in ProcessBatchKeys, where: pm.process_name == ^process_name, select: pm) |> Repo.all
   end
 
   defp batch_keys_for(process_name) do
