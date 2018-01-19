@@ -22,6 +22,10 @@ defmodule BatchProcessCoordination.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import BatchProcessCoordination.DataCase
+
+      def delete_all_process_batch_keys() do
+        (from pm in ProcessBatchKeys, select: pm) |> Repo.delete_all()
+      end
     end
   end
 

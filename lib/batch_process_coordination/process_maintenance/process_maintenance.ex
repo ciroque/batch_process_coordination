@@ -3,21 +3,21 @@ defmodule BatchProcessCoordination.ProcessMaintenance do
 
   import Ecto.Query
 
-  alias BatchProcessCoordination.ProcessModuli
+  alias BatchProcessCoordination.ProcessBatchKeys
   alias BatchProcessCoordination.Repo
 
   def register_process(process_name, key_space \\ 9) do
     for n <- 0..key_space do
-      attrs = %{process_name: process_name, remainder: n}
+      attrs = %{process_name: process_name, key: n}
 
-      %ProcessModuli{}
-      |> ProcessModuli.changeset(attrs)
+      %ProcessBatchKeys{}
+      |> ProcessBatchKeys.changeset(attrs)
       |> Repo.insert()
     end
   end
 
   def unregister_process(process_name) do
-    (from pm in ProcessModuli, where: pm.process_name == ^process_name)
+    (from pm in ProcessBatchKeys, where: pm.process_name == ^process_name)
     |> Repo.delete_all()
   end
 end

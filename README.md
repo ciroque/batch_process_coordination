@@ -17,19 +17,19 @@ size defaults to 10.
 
 DELETE /api/v1/processor/<processor_name>
 
-### Lock Key Maintenance
+### Batch Key Maintenance
 
-#### Request a lock key for a process:
+#### Request a Batch Key for a process:
 
-POST /api/v1/processor/moduli/<processor_name>
+POST /api/v1/processor/batch_keys/<processor_name>
 
 Body: {"hostname": <hostname>}
 
-#### Release a lock key for a process:
+#### Release a Batch Key for a process:
 
-DELETE /api/v1/processor/moduli/<processor_name>/key
+DELETE /api/v1/processor/batch_keys/<processor_name>/key
 
-#### Retrieve current lock key state for a process:
+#### Retrieve current Batch Key state for a process:
 
-GET /api/v1/processor/moduli/<processor_name>
+GET /api/v1/processor/batch_keys/<processor_name>
 
