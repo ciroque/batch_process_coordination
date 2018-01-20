@@ -5,6 +5,10 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyMaintenanceView do
     %{data: batch_key}
   end
 
+  def render("delete.json", %{batch_key: batch_key}) do
+    %{data: batch_key}
+  end
+
   def render("index.json", %{batch_keys: batch_keys}) do
     %{data: render_many(batch_keys, __MODULE__, "batch_key.json")}
   end

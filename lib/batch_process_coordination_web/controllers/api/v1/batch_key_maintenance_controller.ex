@@ -21,4 +21,13 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyMaintenanceController do
         {:error, :not_found}
     end
   end
+
+  def delete(conn, %{"external_id" => external_id}) do
+    case @batch_key_maintenance_impl.release_batch_key(external_id) do
+      {:ok, batch_key} ->
+        conn |> render("delete.json", %{batch_key: batch_key})
+      {:not_found} ->
+        {:error, :not_found}
+    end
+  end
 end

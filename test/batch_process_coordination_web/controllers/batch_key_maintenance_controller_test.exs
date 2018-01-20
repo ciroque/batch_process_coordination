@@ -59,6 +59,23 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyMaintenanceControllerTest d
       conn = post(conn, batch_key_maintenance_path(conn, :create, %{process_name: process_name, machine: machine}))
       assert json_response(conn, :created) == render_json("create.json", %{batch_key: batch_key})
     end
+
+    test "delete calls release_batch_key for unregistered process name", %{conn: conn} do
+      external_id = "6f6586f9-7b48-4a9e-adca-837f2058f4d5"
+      Mock |> expect(:release_batch_key, fn exid -> assert exid === external_id; {:not_found} end)
+      conn = delete(conn, batch_key_maintenance_path(conn, :delete, external_id))
+      assert json_response(conn, :not_found) == render_json(BatchProcessCoordinationWeb.ErrorView, "404.json", %{})
+    end
+
+    test "delete calls release_batch_key for registered process name", %{conn: conn} do
+      process_name = "#{__MODULE__}::DeleteProcess"
+      machine = "#{__MODULE__}::DeleteMachine"
+      external_id = "6f6586f9-7b48-4a9e-adca-837f2058f4d5"
+      batch_key = %{last_completed_at: nil, external_id: external_id, key: 0, machine: machine, process_name: process_name, started_at: nil}
+      Mock |> expect(:release_batch_key, fn exid -> assert exid === external_id; {:ok, batch_key} end)
+      conn = delete(conn, batch_key_maintenance_path(conn, :delete, external_id))
+      assert json_response(conn, :ok) == render_json("delete.json", %{batch_key: batch_key})
+    end
   end
 
   defp render_json(template, assigns) do
