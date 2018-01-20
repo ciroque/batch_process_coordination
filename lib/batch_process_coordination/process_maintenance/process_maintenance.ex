@@ -1,6 +1,7 @@
 defmodule BatchProcessCoordination.ProcessMaintenance do
   @behaviour BatchProcessCoordination.ProcessMaintenanceBehaviour
 
+  import BatchProcessCoordination.Helpers
   import Ecto.Query
 
   alias BatchProcessCoordination.ProcessBatchKeys
@@ -55,9 +56,5 @@ defmodule BatchProcessCoordination.ProcessMaintenance do
                  |> Repo.delete_all()
 
     {:ok, %{process_name: process_name, key_space_size: count}}
-  end
-
-  defp process_name_exists(process_name) do
-    ((from pm in ProcessBatchKeys, where: pm.process_name ==^process_name, select: count(pm.id)) |> Repo.one) > 0
   end
 end

@@ -39,7 +39,7 @@ defmodule BatchProcessCoordination.ProcessMaintenanceTest do
       {:ok, _} = ProcessMaintenance.register_process("two", 7)
       {:ok, _} = ProcessMaintenance.register_process("three", 23)
 
-      assert ProcessMaintenance.list_processes() === {:ok, [
+      assert ProcessMaintenance.list_processes() == {:ok, [
         %{key_space_size: 23, process_name: "three"},
         %{key_space_size: 7, process_name: "two"},
         %{key_space_size: 10, process_name: "one"},

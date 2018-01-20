@@ -1,6 +1,7 @@
 defmodule BatchProcessCoordination.BatchKeyMaintenance do
   @behaviour BatchProcessCoordination.BatchKeyMaintenanceBehaviour
 
+  import BatchProcessCoordination.Helpers
   import Ecto.Query
 
   alias BatchProcessCoordination.{ProcessBatchKeys, Repo}
@@ -8,39 +9,19 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
 
   require Logger
 
-  def request_batch_key(process_name, machine) do
-    update = [set: [machine: machine, started_at: Timex.now(), external_id: UUID.generate()]]
-    query =
-    (
-      from pm in ProcessBatchKeys,
-      join: batch_key in subquery(claim_next_batch_key_for(process_name)),
-        on: batch_key.id == pm.id
-    )
-
-    case query |> Repo.update_all(update, [returning: true]) do
-      {0, []} ->
-        Logger.info("#{__MODULE__}::request_batch_key All keys in use")
-        {:no_keys_free}
-      {1, [%{key: key, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}]} ->
-        result = {:ok, %{key: key, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}}
-        Logger.info("#{__MODULE__}::request_batch_key Result: #{inspect(result)}")
-        result
-      r ->
-        log_key = UUID.generate()
-        Logger.error("#{__MODULE__}::request_batch_key [log_key: #{log_key}] Unexpected result from update query: #{inspect(r)}")
-        {:error, "An error occured. Please review the logs for details. Log key: #{log_key}"}
-    end
+  def list_batch_keys(process_name) do
+    (from pm in ProcessBatchKeys, where: pm.process_name == ^process_name, select: pm) |> Repo.all
   end
 
   def release_batch_key(%{key: key, machine: machine, process_name: process_name, started_at: started_at}) do
     query = (
       from pm in ProcessBatchKeys,
-      where: 1 == 1
-        and pm.process_name == ^process_name
-        and pm.key == ^key
-        and pm.machine == ^machine
-        and not is_nil(pm.started_at)
-    )
+           where: 1 == 1
+                  and pm.process_name == ^process_name
+                  and pm.key == ^key
+                  and pm.machine == ^machine
+           and not is_nil(pm.started_at)
+      )
     update = [set: [machine: nil, started_at: nil, last_completed_at: Timex.now()]]
     case query |> Repo.update_all(update, [returning: true]) do
       {0, []} ->
@@ -61,8 +42,13 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
     end
   end
 
-  def list_batch_keys(process_name) do
-    (from pm in ProcessBatchKeys, where: pm.process_name == ^process_name, select: pm) |> Repo.all
+  def request_batch_key(process_name, machine) do
+    cond do
+      process_name_exists(process_name) ->
+        claim_batch_key_for(process_name, machine)
+      true ->
+        {:not_found}
+    end
   end
 
   defp batch_keys_for(process_name) do
@@ -79,12 +65,28 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
     )
   end
 
-  defp first_batch_key_for(process_name) do
-    (
-      from r in subquery(batch_keys_for(process_name)),
-      where: r.row_number < 2,
-      select: r.key
-    )
+  defp claim_batch_key_for(process_name, machine) do
+    update = [set: [machine: machine, started_at: Timex.now(), external_id: UUID.generate()]]
+    query =
+      (
+        from pm in ProcessBatchKeys,
+             join: batch_key in subquery(claim_next_batch_key_for(process_name)),
+             on: batch_key.id == pm.id
+        )
+
+    case query |> Repo.update_all(update, [returning: true]) do
+      {0, []} ->
+        Logger.info("#{__MODULE__}::request_batch_key All keys in use")
+        {:no_keys_free}
+      {1, [%{key: key, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}]} ->
+        result = {:ok, %{key: key, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}}
+        Logger.info("#{__MODULE__}::request_batch_key Result: #{inspect(result)}")
+        result
+      r ->
+        log_key = UUID.generate()
+        Logger.error("#{__MODULE__}::request_batch_key [log_key: #{log_key}] Unexpected result from update query: #{inspect(r)}")
+        {:error, "An error occured. Please review the logs for details. Log key: #{log_key}"}
+    end
   end
 
   defp claim_next_batch_key_for(process_name) do
@@ -94,5 +96,13 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
         on: batch_keys.key == pm.key,
       where: pm.process_name == ^process_name
     )
+  end
+
+  defp first_batch_key_for(process_name) do
+    (
+      from r in subquery(batch_keys_for(process_name)),
+           where: r.row_number < 2,
+           select: r.key
+      )
   end
 end

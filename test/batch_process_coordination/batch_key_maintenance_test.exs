@@ -15,8 +15,8 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceTest do
       delete_all_process_batch_keys()
     end
 
-    test "returns :no_keys_free when process is not registered" do
-      assert {:no_keys_free} = BatchKeyMaintenance.request_batch_key("NON-EXISTENT-PROCESS", "SOME MACHINE")
+    test "returns :not_found when process is not registered" do
+      assert {:not_found} = BatchKeyMaintenance.request_batch_key("NON-EXISTENT-PROCESS", "SOME MACHINE")
     end
 
     test "request_batch_key obtains a batch key" do
@@ -43,7 +43,7 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceTest do
       |> Enum.reduce(%{}, &update_count/2)
       |> Enum.to_list
       |> Enum.map(fn {_key, count} ->
-        assert count === multiplier
+        assert count == multiplier
       end)
     end
 
