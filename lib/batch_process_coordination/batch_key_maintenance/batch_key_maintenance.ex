@@ -43,45 +43,6 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
     release_batch_key_impl(query, update)
   end
 
-  defp release_batch_key_update_clause() do
-    [
-      set: [
-        machine: nil,
-        started_at: nil,
-        last_completed_at: Timex.now(),
-        external_id: nil
-      ]
-    ]
-  end
-
-  defp release_batch_key_impl(query, update) do
-    case query |> Repo.update_all(update, [returning: true]) do
-      {0, []} ->
-        Logger.info("#{__MODULE__}::release_batch_key Attempt to release unknown key; query: #{inspect(query)}")
-        {:not_found}
-      {1, [%{
-        external_id: external_id,
-        key: key,
-        last_completed_at: last_completed_at,
-        machine: machine,
-        process_name: process_name,
-        started_at: started_at
-      }]} ->
-        {:ok, %{
-          external_id: external_id,
-          key: key,
-          machine: machine,
-          process_name: process_name,
-          started_at: started_at,
-          completed_at: last_completed_at
-        }}
-      r ->
-        log_key = UUID.generate()
-        Logger.error("#{__MODULE__}::release_batch_key [log_key: #{log_key}] Unexpected result from update query: #{inspect(r)}")
-        {:error, "An error occured. Please review the logs for details. Log key: #{log_key}"}
-    end
-  end
-
   def request_batch_key(process_name, machine) do
     cond do
       process_name_exists(process_name) ->
@@ -144,5 +105,44 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
            where: r.row_number < 2,
            select: r.key
       )
+  end
+
+  defp release_batch_key_impl(query, update) do
+    case query |> Repo.update_all(update, [returning: true]) do
+      {0, []} ->
+        Logger.info("#{__MODULE__}::release_batch_key Attempt to release unknown key; query: #{inspect(query)}")
+        {:not_found}
+      {1, [%{
+        external_id: external_id,
+        key: key,
+        last_completed_at: last_completed_at,
+        machine: machine,
+        process_name: process_name,
+        started_at: started_at
+      }]} ->
+        {:ok, %{
+          external_id: external_id,
+          key: key,
+          machine: machine,
+          process_name: process_name,
+          started_at: started_at,
+          completed_at: last_completed_at
+        }}
+      r ->
+        log_key = UUID.generate()
+        Logger.error("#{__MODULE__}::release_batch_key [log_key: #{log_key}] Unexpected result from update query: #{inspect(r)}")
+        {:error, "An error occured. Please review the logs for details. Log key: #{log_key}"}
+    end
+  end
+
+  defp release_batch_key_update_clause() do
+    [
+      set: [
+        machine: nil,
+        started_at: nil,
+        last_completed_at: Timex.now(),
+        external_id: nil
+      ]
+    ]
   end
 end
