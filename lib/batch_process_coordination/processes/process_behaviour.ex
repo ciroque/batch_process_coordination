@@ -1,4 +1,4 @@
-defmodule BatchProcessCoordination.ProcessMaintenanceBehaviour do
+defmodule BatchProcessCoordination.ProcessBehaviour do
   @type process_name_t :: String.t
   @type key_space_t :: integer()
 

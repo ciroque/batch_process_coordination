@@ -1,4 +1,4 @@
-defmodule BatchProcessCoordinationWeb.Api.V1.ProcessMaintenanceView do
+defmodule BatchProcessCoordinationWeb.Api.V1.ProcessView do
   use BatchProcessCoordinationWeb, :view
 
   def render("create.json", %{process_info: process_info}) do
@@ -17,7 +17,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessMaintenanceView do
     %{errors: %{detail: "Process name already exists", process_name: process_name}}
   end
 
-  def render("process_info.json", %{process_maintenance: process_info}) do
+  def render("process_info.json", %{process: process_info}) do
     process_info
   end
 end

@@ -4,8 +4,8 @@ config :batch_process_coordination,
   ecto_repos: [BatchProcessCoordination.Repo]
 
 config :batch_process_coordination,
-  process_maintenance_impl: BatchProcessCoordination.ProcessMaintenance,
-  batch_key_maintenance_impl: BatchProcessCoordination.BatchKeyMaintenance
+  process__impl: BatchProcessCoordination.Process,
+  batch_key__impl: BatchProcessCoordination.BatchKey
 
 config :batch_process_coordination, BatchProcessCoordinationWeb.Endpoint,
   url: [host: "localhost"],

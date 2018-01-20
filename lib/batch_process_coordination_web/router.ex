@@ -9,12 +9,12 @@ defmodule BatchProcessCoordinationWeb.Router do
     pipe_through :api
     scope "/v1", V1 do
       scope "/process" do
-        resources "/", ProcessMaintenanceController, only: [:create, :delete, :index]
+        resources "/", ProcessController, only: [:create, :delete, :index]
 
         scope "/batch_keys" do
-          delete "/:external_id", BatchKeyMaintenanceController, :delete
-          get "/:process_name", BatchKeyMaintenanceController, :index
-          post "/", BatchKeyMaintenanceController, :create
+          delete "/:external_id", BatchKeyController, :delete
+          get "/:process_name", BatchKeyController, :index
+          post "/", BatchKeyController, :create
         end
       end
     end

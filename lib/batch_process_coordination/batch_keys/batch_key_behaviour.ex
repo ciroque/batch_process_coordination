@@ -1,4 +1,4 @@
-defmodule BatchProcessCoordination.BatchKeyMaintenanceBehaviour do
+defmodule BatchProcessCoordination.BatchKeyBehaviour do
   @type process_name_t :: String.t
   @type machine_name_t :: String.t
   @type key_t :: integer()

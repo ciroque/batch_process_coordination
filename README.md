@@ -3,7 +3,7 @@ Maintains keys to help coordinate parallel processes.
 
 ## Routes
 
-### Process Maintenance
+### Processes
 
 #### Retrieve registered process names and their key space size
 
@@ -21,7 +21,7 @@ size defaults to 10.
 
 DELETE /api/v1/process/<process_name>
 
-### Batch Key Maintenance
+### Batch Keys
 
 #### Request a Batch Key for a process:
 

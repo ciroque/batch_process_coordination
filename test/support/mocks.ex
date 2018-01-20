@@ -1,2 +1,2 @@
-Mox.defmock(BatchProcessCoordination.ProcessMaintenanceMock, for: BatchProcessCoordination.ProcessMaintenanceBehaviour)
-Mox.defmock(BatchProcessCoordination.BatchKeyMaintenanceMock, for: BatchProcessCoordination.BatchKeyMaintenanceBehaviour)
+Mox.defmock(BatchProcessCoordination.ProcessMock, for: BatchProcessCoordination.ProcessBehaviour)
+Mox.defmock(BatchProcessCoordination.BatchKeyMock, for: BatchProcessCoordination.BatchKeyBehaviour)

@@ -1,5 +1,5 @@
-defmodule BatchProcessCoordination.ProcessMaintenance do
-  @behaviour BatchProcessCoordination.ProcessMaintenanceBehaviour
+defmodule BatchProcessCoordination.Process do
+  @behaviour BatchProcessCoordination.ProcessBehaviour
 
   import BatchProcessCoordination.Helpers
   import Ecto.Query

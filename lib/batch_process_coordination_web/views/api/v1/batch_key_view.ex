@@ -1,4 +1,4 @@
-defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyMaintenanceView do
+defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyView do
   use BatchProcessCoordinationWeb, :view
 
   def render("create.json", %{batch_key: batch_key}) do
@@ -17,7 +17,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyMaintenanceView do
     %{errors: [%{detail: message}]}
   end
 
-  def render("batch_key.json", %{batch_key_maintenance: batch_key}) do
+  def render("batch_key.json", %{batch_key: batch_key}) do
     batch_key
   end
 end
