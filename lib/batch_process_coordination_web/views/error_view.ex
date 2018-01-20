@@ -2,11 +2,11 @@ defmodule BatchProcessCoordinationWeb.ErrorView do
   use BatchProcessCoordinationWeb, :view
 
   def render("404.json", _assigns) do
-    %{errors: %{detail: "Not found"}}
+    %{errors: [%{detail: "Not found"}]}
   end
 
   def render("500.json", _assigns) do
-    %{errors: %{detail: "Internal server error"}}
+    %{errors: [%{detail: "Internal server error"}]}
   end
 
   # In case no render clause matches or no

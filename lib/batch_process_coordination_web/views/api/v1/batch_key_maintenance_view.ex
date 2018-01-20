@@ -14,7 +14,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyMaintenanceView do
   end
 
   def render("conflict.json", %{message: message}) do
-    %{errors: %{detail: message}}
+    %{errors: [%{detail: message}]}
   end
 
   def render("batch_key.json", %{batch_key_maintenance: batch_key}) do
