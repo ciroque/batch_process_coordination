@@ -5,11 +5,15 @@ Maintains keys to help coordinate parallel processes.
 
 ### Process Maintenance
 
+#### Retrieve registered process names and their key space size
+
+GET /api/v1/process
+
 #### Register a new batch process
 
-POST to /api/v1/process
+POST /api/v1/process
 
-Body: {"name": <your_name>, "key_space": <size>}
+Body: {"name": <process_name>, "key_space": <size>}
   
 size defaults to 10.
 
