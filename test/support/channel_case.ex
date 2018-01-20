@@ -33,5 +33,4 @@ defmodule BatchProcessCoordinationWeb.ChannelCase do
     end
     :ok
   end
-
 end

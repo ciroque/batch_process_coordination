@@ -1,0 +1,1 @@
+Mox.defmock(BatchProcessCoordination.ProcessMaintenanceMock, for: BatchProcessCoordination.ProcessMaintenanceBehaviour)
