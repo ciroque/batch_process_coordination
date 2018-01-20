@@ -25,9 +25,9 @@ DELETE /api/v1/process/<process_name>
 
 #### Request a Batch Key for a process:
 
-POST /api/v1/process/batch_keys/<process_name>
+POST /api/v1/process/batch_keys
 
-Body: {"hostname": <hostname>}
+Body: {"process_name": <process name>, "machine": <machine name>}
 
 #### Release a Batch Key for a process:
 
