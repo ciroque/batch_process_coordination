@@ -17,6 +17,10 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyMaintenanceController do
         conn
         |> put_status(:created)
         |> render("create.json", %{batch_key: batch_key})
+      {:no_keys_free} ->
+        conn
+        |> put_status(:conflict)
+        |> render("conflict.json", %{message: "All keys for process '#{process_name}' have been reserved."})
       {:not_found} ->
         {:error, :not_found}
     end

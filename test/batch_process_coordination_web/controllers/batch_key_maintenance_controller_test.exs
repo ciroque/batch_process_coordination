@@ -60,6 +60,13 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyMaintenanceControllerTest d
       assert json_response(conn, :created) == render_json("create.json", %{batch_key: batch_key})
     end
 
+    test "key space is depleted for existing process", %{conn: conn} do
+      process_name = "#{__MODULE__}::PostProcess"
+      Mock |> expect(:request_batch_key, fn _, _ -> {:no_keys_free} end)
+      conn = post(conn, batch_key_maintenance_path(conn, :create, %{process_name: process_name, machine: "doesn't matter"}))
+      assert json_response(conn, :conflict) == render_json("conflict.json", %{message: "All keys for process '#{process_name}' have been reserved."})
+    end
+
     test "delete calls release_batch_key for unregistered process name", %{conn: conn} do
       external_id = "6f6586f9-7b48-4a9e-adca-837f2058f4d5"
       Mock |> expect(:release_batch_key, fn exid -> assert exid === external_id; {:not_found} end)
