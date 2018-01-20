@@ -10,7 +10,18 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
   require Logger
 
   def list_batch_keys(process_name) do
-    (from pm in ProcessBatchKeys, where: pm.process_name == ^process_name, select: pm) |> Repo.all
+    (from pm in ProcessBatchKeys, where: pm.process_name == ^process_name, select: pm)
+    |> Repo.all
+    |> Enum.map(fn batch_key ->
+      %{
+        last_completed_at: batch_key.last_completed_at,
+        external_id: batch_key.external_id,
+        key: batch_key.key,
+        machine: batch_key.machine,
+        process_name: batch_key.process_name,
+        started_at: batch_key.started_at,
+      }
+    end)
   end
 
   def release_batch_key(%{key: key, machine: machine, process_name: process_name, started_at: started_at}) do

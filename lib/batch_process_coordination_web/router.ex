@@ -10,6 +10,10 @@ defmodule BatchProcessCoordinationWeb.Router do
     scope "/v1", V1 do
       scope "/process" do
         resources "/", ProcessMaintenanceController, only: [:create, :delete, :index]
+
+        scope "/batch_keys" do
+          resources "/:process_name", BatchKeyMaintenanceController, only: [:create, :index]
+        end
       end
     end
   end

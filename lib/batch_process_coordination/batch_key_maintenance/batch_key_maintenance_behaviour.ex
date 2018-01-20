@@ -5,7 +5,7 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceBehaviour do
   @type last_completed_at_t :: String.t
 
   @type batch_key_result_t :: %{
-    completed_at: Timex.DateTime.t,
+    last_completed_at: Timex.DateTime.t,
     external_id: String.t,
     key: integer(),
     machine: String.t,

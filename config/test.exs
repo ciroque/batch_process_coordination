@@ -5,7 +5,8 @@ config :batch_process_coordination, BatchProcessCoordinationWeb.Endpoint,
   server: false
 
 config :batch_process_coordination,
-  process_maintenance_impl: BatchProcessCoordination.ProcessMaintenanceMock
+  process_maintenance_impl: BatchProcessCoordination.ProcessMaintenanceMock,
+  batch_key_maintenance_impl: BatchProcessCoordination.BatchKeyMaintenanceMock
 
 config :logger, level: :warn
 

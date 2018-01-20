@@ -5,10 +5,8 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessMaintenanceControllerTest do
 
   alias BatchProcessCoordination.ProcessMaintenanceMock, as: Mock
 
-  describe "ProcessMaintenanceControllerTest" do
-    setup do
-      verify_on_exit!()
-    end
+  describe "ProcessMaintenanceController" do
+    setup do: verify_on_exit!()
 
     test "index calls list_processes on ProcessMaintenance", %{conn: conn} do
       Mock |> expect(:list_processes, fn -> {:ok, []} end)
