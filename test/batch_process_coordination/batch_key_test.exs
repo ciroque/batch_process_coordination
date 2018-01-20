@@ -171,14 +171,14 @@ defmodule BatchProcessCoordination.BatchKeyTest do
     end
 
     test "list_batch_keys returns empty list for unknown process" do
-      assert BatchKey.list_batch_keys("UNKNOWN") === []
+      assert BatchKey.list_batch_keys("UNKNOWN") === {:ok, []}
     end
 
     test "list_batch_keys returns correct list for process" do
       Process.register_process(@first_process_name)
       {:ok, %{key_space_size: key_space_size}} = Process.register_process(@second_process_name)
-
-      assert length(BatchKey.list_batch_keys(@second_process_name)) === key_space_size
+      {:ok, batch_keys} = BatchKey.list_batch_keys(@second_process_name)
+      assert length(batch_keys) === key_space_size
     end
   end
 end
