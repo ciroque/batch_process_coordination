@@ -28,33 +28,34 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceTest do
       assert process_name === @first_process_name
     end
 
-    test "request_batch_key obtains successive batch keys" do
-      ProcessMaintenance.register_process(@first_process_name)
-      {:ok, %{key: key, machine: machine, process_name: process_name}} = BatchKeyMaintenance.request_batch_key(@first_process_name, @machine_one_name)
+    test "even batch key distribution" do
+      multiplier = 30
+      {:ok, %{key_space_size: key_space_size}} = ProcessMaintenance.register_process(@first_process_name)
 
-      assert key === 0
-      assert machine === @machine_one_name
-      assert process_name === @first_process_name
+      1..key_space_size * multiplier
+      |> Enum.map(
+        fn n ->
+          {:ok, batch_key} = BatchKeyMaintenance.request_batch_key(@first_process_name, @base_machine_name <> "-#{rem(n, multiplier)}")
+          BatchKeyMaintenance.release_batch_key(batch_key)
+          batch_key
+        end
+      )
+      |> Enum.reduce(%{}, &update_count/2)
+      |> Enum.to_list
+      |> Enum.map(fn {_key, count} ->
+        assert count === multiplier
+      end)
+    end
 
-      {:ok, %{key: key, machine: machine, process_name: process_name}} = BatchKeyMaintenance.request_batch_key(@first_process_name, @machine_one_name)
-
-      assert key === 1
-      assert machine === @machine_one_name
-      assert process_name === @first_process_name
-
-      {:ok, %{key: key, machine: machine, process_name: process_name}} = BatchKeyMaintenance.request_batch_key(@first_process_name, @machine_one_name)
-
-      assert key === 2
-      assert machine === @machine_one_name
-      assert process_name === @first_process_name
+    defp update_count(batch_key, acc) do
+      Map.update(acc, batch_key.key, 1, &(&1 + 1))
     end
 
     test "deplete the key space results in :no_keys_free" do
       ProcessMaintenance.register_process(@first_process_name)
 
-      for n <- 0..9 do
-        {:ok, %{key: key}} = BatchKeyMaintenance.request_batch_key(@first_process_name, @machine_one_name)
-        assert key === n
+      for _ <- 0..9 do
+        {:ok, %{key: _}} = BatchKeyMaintenance.request_batch_key(@first_process_name, @machine_one_name)
       end
 
       assert {:no_keys_free} = BatchKeyMaintenance.request_batch_key(@first_process_name, @machine_one_name)
