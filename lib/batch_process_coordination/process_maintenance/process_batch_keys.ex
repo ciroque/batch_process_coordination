@@ -8,13 +8,14 @@ defmodule BatchProcessCoordination.ProcessBatchKeys do
     field :machine, :string
     field :started_at, :utc_datetime
     field :last_completed_at, :utc_datetime
+    field :external_id, :string
 
     timestamps()
   end
 
   def changeset(%__MODULE__{} = process_batch_key, attrs) do
     process_batch_key
-    |> cast(attrs, [:process_name, :key, :machine, :started_at, :last_completed_at])
+    |> cast(attrs, [:process_name, :key, :machine, :started_at, :last_completed_at, :external_id])
     |> validate_required([:process_name, :key])
   end
 end

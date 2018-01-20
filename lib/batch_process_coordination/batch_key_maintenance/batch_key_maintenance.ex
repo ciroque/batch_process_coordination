@@ -4,11 +4,12 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
   import Ecto.Query
 
   alias BatchProcessCoordination.{ProcessBatchKeys, Repo}
+  alias Ecto.UUID
 
   require Logger
 
   def request_batch_key(process_name, machine) do
-    update = [set: [machine: machine, started_at: Timex.now()]]
+    update = [set: [machine: machine, started_at: Timex.now(), external_id: UUID.generate()]]
     query =
     (
       from pm in ProcessBatchKeys,
@@ -20,12 +21,12 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
       {0, []} ->
         Logger.info("#{__MODULE__}::request_batch_key All keys in use")
         {:no_keys_free}
-      {1, [%{key: key, machine: machine, process_name: process_name, started_at: started_at}]} ->
-        result = {:ok, %{key: key, machine: machine, process_name: process_name, started_at: started_at}}
+      {1, [%{key: key, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}]} ->
+        result = {:ok, %{key: key, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}}
         Logger.info("#{__MODULE__}::request_batch_key Result: #{inspect(result)}")
         result
       r ->
-        log_key = Ecto.UUID.generate()
+        log_key = UUID.generate()
         Logger.error("#{__MODULE__}::request_batch_key [log_key: #{log_key}] Unexpected result from update query: #{inspect(r)}")
         {:error, "An error occured. Please review the logs for details. Log key: #{log_key}"}
     end
@@ -54,7 +55,7 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
           completed_at: last_completed_at
         }}
       r ->
-        log_key = Ecto.UUID.generate()
+        log_key = UUID.generate()
         Logger.error("#{__MODULE__}::release_batch_key [log_key: #{log_key}] Unexpected result from update query: #{inspect(r)}")
         {:error, "An error occured. Please review the logs for details. Log key: #{log_key}"}
     end
