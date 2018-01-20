@@ -4,6 +4,7 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceTest do
   import Ecto.Query
 
   alias BatchProcessCoordination.{BatchKeyMaintenance, ProcessMaintenance}
+  alias Ecto.UUID
 
   @first_process_name "BPC-Test-Process-1"
   @second_process_name "BPC-Test-Process-2"
@@ -72,6 +73,44 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceTest do
       assert process_name === @first_process_name
     end
 
+    test "release_batch_key for unknown external_id returns :not_found" do
+      external_id = UUID.generate()
+      assert {:not_found} === BatchKeyMaintenance.release_batch_key(external_id)
+    end
+
+    test "release_batch_key for known external_id" do
+      ProcessMaintenance.register_process(@first_process_name)
+      {
+        :ok,
+        %{
+          external_id: external_id,
+          key: key,
+          process_name: process_name
+        }
+      } = BatchKeyMaintenance.request_batch_key(@first_process_name, @machine_one_name)
+
+      {
+        :ok,
+        %{
+          completed_at: released_completed_at,
+          external_id: released_external_id,
+          key: released_key,
+          machine: released_machine,
+          process_name: released_process_name,
+          started_at: released_started_at
+        }
+      } = BatchKeyMaintenance.release_batch_key(external_id)
+
+      assert released_machine === nil
+      assert released_started_at === nil
+      assert released_external_id === nil
+
+      assert released_completed_at !== nil
+
+      assert key === released_key
+      assert process_name === released_process_name
+    end
+
     test "release_batch_key for unknown combo returns :not_found" do
       unknown_batch_key = %{
         process_name: "UNKNOWN",
@@ -96,10 +135,9 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceTest do
       ProcessMaintenance.register_process(@first_process_name)
       {:ok, batch_key} = BatchKeyMaintenance.request_batch_key(@first_process_name, @machine_one_name)
 
-      {:ok, %{key: key, machine: machine, process_name: process_name, completed_at: completed_at}} = BatchKeyMaintenance.release_batch_key(batch_key)
+      {:ok, %{key: key, process_name: process_name, completed_at: completed_at}} = BatchKeyMaintenance.release_batch_key(batch_key)
 
       assert key === 0
-      assert machine === @machine_one_name
       assert process_name === @first_process_name
       assert completed_at !== nil
     end

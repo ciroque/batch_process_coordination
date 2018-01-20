@@ -3,6 +3,7 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceBehaviour do
   @type machine_name_t :: String.t
   @type key_t :: integer()
   @type last_completed_at_t :: String.t
+  @type external_id_t :: String.t
 
   @type batch_key_result_t :: %{
     last_completed_at: Timex.DateTime.t,
@@ -18,6 +19,8 @@ defmodule BatchProcessCoordination.BatchKeyMaintenanceBehaviour do
   @callback request_batch_key(process_name_t, machine_name_t) :: {:ok, batch_key_result_t} | {:error, map()} | {:error, String.t}
 
   @callback release_batch_key(batch_key_result_t) :: {:ok, batch_key_result_t} | {:error, map()}
+
+  @callback release_batch_key(external_id_t) :: {:ok, batch_key_result_t} | {:error, map()}
 
   @callback list_batch_keys(process_name_t) :: list(ProcessBatchKeys.t)
 end

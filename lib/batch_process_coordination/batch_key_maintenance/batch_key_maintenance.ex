@@ -24,7 +24,7 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
     end)
   end
 
-  def release_batch_key(%{key: key, machine: machine, process_name: process_name, started_at: started_at}) do
+  def release_batch_key(%{key: key, machine: machine, process_name: process_name}) do
     query = (
       from pm in ProcessBatchKeys,
            where: 1 == 1
@@ -33,13 +33,42 @@ defmodule BatchProcessCoordination.BatchKeyMaintenance do
                   and pm.machine == ^machine
            and not is_nil(pm.started_at)
       )
-    update = [set: [machine: nil, started_at: nil, last_completed_at: Timex.now()]]
+    update = release_batch_key_update_clause()
+    release_batch_key_impl(query, update)
+  end
+
+  def release_batch_key(external_id) when is_binary(external_id) do
+    query = (from pm in ProcessBatchKeys, where: pm.external_id == ^external_id and not is_nil(pm.started_at))
+    update = release_batch_key_update_clause()
+    release_batch_key_impl(query, update)
+  end
+
+  defp release_batch_key_update_clause() do
+    [
+      set: [
+        machine: nil,
+        started_at: nil,
+        last_completed_at: Timex.now(),
+        external_id: nil
+      ]
+    ]
+  end
+
+  defp release_batch_key_impl(query, update) do
     case query |> Repo.update_all(update, [returning: true]) do
       {0, []} ->
-        Logger.info("#{__MODULE__}::release_batch_key Attempt to release unknown key; process_name: #{process_name}, machine: #{machine}, key: #{key}")
+        Logger.info("#{__MODULE__}::release_batch_key Attempt to release unknown key; query: #{inspect(query)}")
         {:not_found}
-      {1, [%{last_completed_at: last_completed_at}]} ->
+      {1, [%{
+        external_id: external_id,
+        key: key,
+        last_completed_at: last_completed_at,
+        machine: machine,
+        process_name: process_name,
+        started_at: started_at
+      }]} ->
         {:ok, %{
+          external_id: external_id,
           key: key,
           machine: machine,
           process_name: process_name,
