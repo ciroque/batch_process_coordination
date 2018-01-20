@@ -5,8 +5,6 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessMaintenanceControllerTest do
 
   alias BatchProcessCoordination.ProcessMaintenanceMock, as: Mock
 
-  @process_name "#{__MODULE__}:TestProcess"
-
   describe "ProcessMaintenanceControllerTest" do
     setup do
       verify_on_exit!()
@@ -26,15 +24,17 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessMaintenanceControllerTest do
     end
 
     test "delete calls unregister_process and renders not found", %{conn: conn} do
-      Mock |> expect(:unregister_process, fn _process_name -> {:not_found} end)
-      conn = delete(conn, process_maintenance_path(conn, :delete, "yikes"))
+      process_name = "#{__MODULE__}:DeleteProcess"
+      Mock |> expect(:unregister_process, fn pn -> assert pn === process_name; {:not_found} end)
+      conn = delete(conn, process_maintenance_path(conn, :delete, process_name))
       assert json_response(conn, :not_found) == render_json(BatchProcessCoordinationWeb.ErrorView, "404.json", %{})
     end
 
     test "delete calls unregister_process on existing process_name", %{conn: conn} do
-      process_info = %{process_name: @process_name, key_space_size: 247}
-      Mock |> expect(:unregister_process, fn _process_name -> {:ok, process_info} end)
-      conn = delete(conn, process_maintenance_path(conn, :delete, @process_name))
+      process_name = "#{__MODULE__}:DeleteProcess"
+      process_info = %{process_name: process_name, key_space_size: 247}
+      Mock |> expect(:unregister_process, fn pn -> assert pn === process_name; {:ok, process_info} end)
+      conn = delete(conn, process_maintenance_path(conn, :delete, process_name))
       assert json_response(conn, :ok) == render_json("delete.json", %{process_info: process_info})
     end
 
