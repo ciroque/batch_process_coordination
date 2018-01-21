@@ -53,14 +53,18 @@ defmodule BatchProcessCoordination.BatchKeyTest do
     end
 
     test "deplete the key space results in :no_keys_free" do
+      expected_error_message = "All keys for process 'BPC-Test-Process-1' have been reserved."
       Process.register_process(@first_process_name)
 
       for _ <- 0..9 do
         {:ok, %BatchKeyInfo{key: _}} = BatchKey.request_batch_key(@first_process_name, @machine_one_name)
       end
 
-      assert {:error, :no_keys_free} = BatchKey.request_batch_key(@first_process_name, @machine_one_name)
-      assert {:error, :no_keys_free} = BatchKey.request_batch_key(@first_process_name, @machine_one_name)
+      assert {:error, actual_error_message} = BatchKey.request_batch_key(@first_process_name, @machine_one_name)
+      assert actual_error_message === expected_error_message
+
+      assert {:error, actual_error_message} = BatchKey.request_batch_key(@first_process_name, @machine_one_name)
+      assert actual_error_message === expected_error_message
     end
 
     test "request_batch_key obtains a batch key when multiple processes exist" do

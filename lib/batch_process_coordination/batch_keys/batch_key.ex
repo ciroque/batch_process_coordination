@@ -80,8 +80,7 @@ defmodule BatchProcessCoordination.BatchKey do
     case query |> Repo.update_all(update, [returning: true]) do
       {0, []} ->
         Logger.info("#{__MODULE__}::request_batch_key All keys in use")
-        {:error, :no_keys_free}
-#        {:error, "All keys for process '#{process_name}' have been reserved."}
+        {:error, "All keys for process '#{process_name}' have been reserved."}
       {1, [%ProcessBatchKeys{key: key, last_completed_at: last_completed_at, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}]} ->
         result = {:ok, %BatchKeyInfo{key: key, last_completed_at: last_completed_at, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}}
         Logger.info("#{__MODULE__}::request_batch_key Result: #{inspect(result)}")
