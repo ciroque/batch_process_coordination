@@ -14,5 +14,6 @@ config :batch_process_coordination, BatchProcessCoordination.Repo,
        adapter: Ecto.Adapters.Postgres,
        username: "postgres",
        password: "postgres",
-       database: "batch_process_coordination_prod",
+       database: "batch_process_coordination",
+       hostname: "database-host",
        pool_size: 15
