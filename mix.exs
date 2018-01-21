@@ -41,6 +41,7 @@ defmodule BatchProcessCoordination.Mixfile do
       {:phoenix_ecto, "~> 3.2"},
       {:postgrex, ">= 0.0.0"},
       {:timex, "~> 3.1"},
+      {:distillery, "~> 1.5"},
     ]
   end
 

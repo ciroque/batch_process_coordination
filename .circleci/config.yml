@@ -25,3 +25,51 @@ jobs:
       - run: mix deps.get
       - run: mix ecto.create
       - run: mix test
+      
+#
+# Dockerize
+#
+      - type: setup-docker-engine
+        version: 17.06.0-ce
+
+      - run:
+          name: Docker Build
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            if [ "${CIRCLE_BRANCH}" == "alpha" ]; then
+              docker build --build-arg mix_env=alpha -t ciroque/batch_process_coordination:$CIRCLE_BRANCH .
+            elif [ "${CIRCLE_BRANCH}" == "beta" ]; then
+              docker build --build-arg mix_env=beta -t ciroque/batch_process_coordination:$CIRCLE_BRANCH .
+            else
+              docker build --build-arg mix_env=prod -t ciroque/batch_process_coordination:$CIRCLE_BRANCH .
+            fi
+
+      - run:
+          name: Publish container tagged with branch
+          command: |
+            docker push ciroque/batch_process_coordination:$CIRCLE_BRANCH
+            docker tag ciroque/batch_process_coordination:$CIRCLE_BRANCH ciroque/batch_process_coordination:release
+
+      - run:
+          name: Publish latest if master
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              docker tag ciroque/batch_process_coordination:release ciroque/batch_process_coordination:latest
+              docker push ciroque/batch_process_coordination:latest
+            fi
+
+      - deploy:
+          name: Deploy Alpha image to Docker Hub if alpha branch
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "alpha" ]; then
+              docker tag ciroque/batch_process_coordination:release ciroque/batch_process_coordination:alpha
+              docker push ciroque/batch_process_coordination:alpha
+            fi
+
+      - deploy:
+          name: Deploy Beta image to Docker Hub if beta branch
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "beta" ]; then
+              docker tag ciroque/batch_process_coordination:release ciroque/batch_process_coordination:beta
+              docker push ciroque/batch_process_coordination:beta
+            fi
