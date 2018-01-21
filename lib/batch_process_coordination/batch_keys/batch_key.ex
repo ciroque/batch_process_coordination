@@ -4,7 +4,7 @@ defmodule BatchProcessCoordination.BatchKey do
   import BatchProcessCoordination.Helpers
   import Ecto.Query
 
-  alias BatchProcessCoordination.{ProcessBatchKeys, Repo}
+  alias BatchProcessCoordination.{BatchKeyInfo, ProcessBatchKeys, Repo}
   alias Ecto.UUID
 
   require Logger
@@ -13,7 +13,7 @@ defmodule BatchProcessCoordination.BatchKey do
     batch_keys = (from pm in ProcessBatchKeys, where: pm.process_name == ^process_name, select: pm)
     |> Repo.all
     |> Enum.map(fn batch_key ->
-      %{
+      %BatchKeyInfo{
         last_completed_at: batch_key.last_completed_at,
         external_id: batch_key.external_id,
         key: batch_key.key,
@@ -81,8 +81,8 @@ defmodule BatchProcessCoordination.BatchKey do
       {0, []} ->
         Logger.info("#{__MODULE__}::request_batch_key All keys in use")
         {:no_keys_free}
-      {1, [%{key: key, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}]} ->
-        result = {:ok, %{key: key, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}}
+      {1, [%ProcessBatchKeys{key: key, last_completed_at: last_completed_at, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}]} ->
+        result = {:ok, %BatchKeyInfo{key: key, last_completed_at: last_completed_at, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}}
         Logger.info("#{__MODULE__}::request_batch_key Result: #{inspect(result)}")
         result
       r ->
@@ -114,7 +114,7 @@ defmodule BatchProcessCoordination.BatchKey do
       {0, []} ->
         Logger.info("#{__MODULE__}::release_batch_key Attempt to release unknown key; query: #{inspect(query)}")
         {:not_found}
-      {1, [%{
+      {1, [%ProcessBatchKeys{
         external_id: external_id,
         key: key,
         last_completed_at: last_completed_at,
@@ -122,13 +122,13 @@ defmodule BatchProcessCoordination.BatchKey do
         process_name: process_name,
         started_at: started_at
       }]} ->
-        {:ok, %{
+        {:ok, %BatchKeyInfo{
           external_id: external_id,
           key: key,
+          last_completed_at: last_completed_at,
           machine: machine,
           process_name: process_name,
           started_at: started_at,
-          completed_at: last_completed_at
         }}
       r ->
         log_key = UUID.generate()

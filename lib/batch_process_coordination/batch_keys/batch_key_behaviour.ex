@@ -5,14 +5,7 @@ defmodule BatchProcessCoordination.BatchKeyBehaviour do
   @type last_completed_at_t :: String.t
   @type external_id_t :: String.t
 
-  @type batch_key_result_t :: %{
-    external_id: String.t,
-    key: integer(),
-    last_completed_at: Timex.DateTime.t,
-    machine: String.t,
-    process_name: String.t,
-    started_at: Timex.DateTime.t
-  }
+  @type batch_key_result_t :: BatchProcessCoordination.BatchKeyInfo.t
 
   alias BatchProcessCoordination.ProcessBatchKeys
 
