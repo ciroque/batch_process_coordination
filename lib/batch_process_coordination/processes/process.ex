@@ -6,7 +6,16 @@ defmodule BatchProcessCoordination.Process do
 
   alias BatchProcessCoordination.{ProcessBatchKeys, ProcessInfo, Repo}
 
-  def register_process(process_name, key_space_size \\ 10) do
+  @process_name_cannot_be_empty "process_name cannot be an empty string."
+
+  def register_process(process_name, key_space_size \\ 10)
+  def register_process(process_name, _key_space_size) when is_nil(process_name) do
+    {:error, %{detail: @process_name_cannot_be_empty}}
+  end
+  def register_process("" = _process_name, _key_space_size) do
+    {:error, %{detail: @process_name_cannot_be_empty}}
+  end
+  def register_process(process_name, key_space_size) do
     cond do
       process_name_exists(process_name) -> {:name_already_exists}
       true -> create_process_key_space(process_name, key_space_size)

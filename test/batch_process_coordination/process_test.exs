@@ -9,6 +9,14 @@ defmodule BatchProcessCoordination.ProcessTest do
       delete_all_process_batch_keys()
     end
 
+    test "Register Process disallows empty string as process_name" do
+      assert {:error, %{detail: "process_name cannot be an empty string."}} == Process.register_process("")
+    end
+
+    test "Register Process disallows nil as process_name" do
+      assert {:error, %{detail: "process_name cannot be an empty string."}} == Process.register_process(nil)
+    end
+
     test "Register Process creates all batch keys with default key space" do
       {:ok, %{key_space_size: key_space_size}} = Process.register_process("test one process")
       assert key_space_size === 10
