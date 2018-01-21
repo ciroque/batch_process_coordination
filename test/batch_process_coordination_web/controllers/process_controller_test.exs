@@ -3,7 +3,6 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessControllerTest do
 
   import Mox
 
-  alias BatchProcessCoordinationWeb.ErrorHelpers
   alias BatchProcessCoordination.ProcessInfo
   alias BatchProcessCoordination.ProcessMock, as: Mock
 
@@ -63,13 +62,6 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessControllerTest do
       conn = post(conn, process_path(conn, :create, %{process_name: process_name}))
       assert json_response(conn, :unprocessable_entity) == format_json_api_error(error_message)
     end
-  end
-
-  defp format_json_api_error(detail) do
-    detail
-    |> ErrorHelpers.build_json_api_error
-    |> Poison.encode!
-    |> Poison.decode!
   end
 
   defp render_json(template, assigns) do

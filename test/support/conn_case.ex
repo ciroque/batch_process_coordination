@@ -20,9 +20,18 @@ defmodule BatchProcessCoordinationWeb.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
       import BatchProcessCoordinationWeb.Router.Helpers
+      alias BatchProcessCoordinationWeb.ErrorHelpers
 
       # The default endpoint for testing
       @endpoint BatchProcessCoordinationWeb.Endpoint
+
+
+      defp format_json_api_error(detail) do
+        detail
+        |> ErrorHelpers.build_json_api_error
+        |> Poison.encode!
+        |> Poison.decode!
+      end
     end
   end
 

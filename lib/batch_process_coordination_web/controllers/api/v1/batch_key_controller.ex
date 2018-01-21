@@ -14,17 +14,10 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyController do
   end
 
   def create(conn, %{"process_name" => process_name, "machine" => machine}) do
-    case @batch_key__impl.request_batch_key(process_name, machine) do
-      {:ok, %BatchKeyInfo{} = batch_key} ->
-        conn
-        |> put_status(:created)
-        |> render("create.json", %{batch_key: batch_key})
-      {:no_keys_free} ->
-        conn
-        |> put_status(:conflict)
-        |> render("conflict.json", %{message: "All keys for process '#{process_name}' have been reserved."})
-      {:not_found} ->
-        {:error, :not_found}
+    with {:ok, %BatchKeyInfo{} = batch_key} <- @batch_key__impl.request_batch_key(process_name, machine) do
+      conn
+      |> put_status(:created)
+      |> render("create.json", %{batch_key: batch_key})
     end
   end
 

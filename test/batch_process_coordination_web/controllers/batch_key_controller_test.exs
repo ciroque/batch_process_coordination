@@ -38,7 +38,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyControllerTest do
           assert pn === process_name
           assert mn === machine
 
-          {:not_found}
+          {:error, :not_found}
         end)
       conn = post(conn, batch_key_path(conn, :create, %{process_name: process_name, machine: machine}))
       assert json_response(conn, :not_found) == render_json(BatchProcessCoordinationWeb.ErrorView, "404.json", %{})
@@ -63,9 +63,10 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyControllerTest do
 
     test "key space is depleted for existing process", %{conn: conn} do
       process_name = "#{__MODULE__}::PostProcess"
-      Mock |> expect(:request_batch_key, fn _, _ -> {:no_keys_free} end)
+      error_message = "All keys for process '#{process_name}' have been reserved."
+      Mock |> expect(:request_batch_key, fn _, _ -> {:error, error_message} end)
       conn = post(conn, batch_key_path(conn, :create, %{process_name: process_name, machine: "doesn't matter"}))
-      assert json_response(conn, :conflict) == render_json("conflict.json", %{message: "All keys for process '#{process_name}' have been reserved."})
+      assert json_response(conn, :unprocessable_entity) == format_json_api_error(error_message)
     end
 
     test "delete calls release_batch_key for unregistered process name", %{conn: conn} do
