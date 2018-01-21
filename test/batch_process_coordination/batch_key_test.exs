@@ -17,7 +17,7 @@ defmodule BatchProcessCoordination.BatchKeyTest do
     end
 
     test "returns :not_found when process is not registered" do
-      assert {:not_found} = BatchKey.request_batch_key("NON-EXISTENT-PROCESS", "SOME MACHINE")
+      assert {:error, :not_found} = BatchKey.request_batch_key("NON-EXISTENT-PROCESS", "SOME MACHINE")
     end
 
     test "request_batch_key obtains a batch key" do
@@ -30,7 +30,7 @@ defmodule BatchProcessCoordination.BatchKeyTest do
     end
 
     test "even batch key distribution" do
-      multiplier = 30
+      multiplier = 73
       {:ok, %ProcessInfo{key_space_size: key_space_size}} = Process.register_process(@first_process_name)
 
       1..key_space_size * multiplier
@@ -59,8 +59,8 @@ defmodule BatchProcessCoordination.BatchKeyTest do
         {:ok, %BatchKeyInfo{key: _}} = BatchKey.request_batch_key(@first_process_name, @machine_one_name)
       end
 
-      assert {:no_keys_free} = BatchKey.request_batch_key(@first_process_name, @machine_one_name)
-      assert {:no_keys_free} = BatchKey.request_batch_key(@first_process_name, @machine_one_name)
+      assert {:error, :no_keys_free} = BatchKey.request_batch_key(@first_process_name, @machine_one_name)
+      assert {:error, :no_keys_free} = BatchKey.request_batch_key(@first_process_name, @machine_one_name)
     end
 
     test "request_batch_key obtains a batch key when multiple processes exist" do
@@ -75,7 +75,7 @@ defmodule BatchProcessCoordination.BatchKeyTest do
 
     test "release_batch_key for unknown external_id returns :not_found" do
       external_id = UUID.generate()
-      assert {:not_found} === BatchKey.release_batch_key(external_id)
+      assert {:error, :not_found} === BatchKey.release_batch_key(external_id)
     end
 
     test "release_batch_key for known external_id" do
@@ -120,7 +120,7 @@ defmodule BatchProcessCoordination.BatchKeyTest do
         started_at: Timex.now,
       }
 
-      assert {:not_found} === BatchKey.release_batch_key(unknown_batch_key)
+      assert {:error, :not_found} === BatchKey.release_batch_key(unknown_batch_key)
     end
 
     test "release_batch_key for previously released combo results in :not_found" do
@@ -128,8 +128,8 @@ defmodule BatchProcessCoordination.BatchKeyTest do
       {:ok, batch_key} = BatchKey.request_batch_key(@first_process_name, @machine_one_name)
 
       {:ok, _} = BatchKey.release_batch_key(batch_key)
-      assert {:not_found} === BatchKey.release_batch_key(batch_key)
-      assert {:not_found} === BatchKey.release_batch_key(batch_key)
+      assert {:error, :not_found} === BatchKey.release_batch_key(batch_key)
+      assert {:error, :not_found} === BatchKey.release_batch_key(batch_key)
     end
 
     test "release_batch_key succeeds" do

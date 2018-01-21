@@ -50,7 +50,7 @@ defmodule BatchProcessCoordination.BatchKey do
       process_name_exists(process_name) ->
         claim_batch_key_for(process_name, machine)
       true ->
-        {:not_found}
+        {:error, :not_found}
     end
   end
 
@@ -80,7 +80,7 @@ defmodule BatchProcessCoordination.BatchKey do
     case query |> Repo.update_all(update, [returning: true]) do
       {0, []} ->
         Logger.info("#{__MODULE__}::request_batch_key All keys in use")
-        {:no_keys_free}
+        {:error, :no_keys_free}
       {1, [%ProcessBatchKeys{key: key, last_completed_at: last_completed_at, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}]} ->
         result = {:ok, %BatchKeyInfo{key: key, last_completed_at: last_completed_at, machine: machine, process_name: process_name, started_at: started_at, external_id: external_id}}
         Logger.info("#{__MODULE__}::request_batch_key Result: #{inspect(result)}")
@@ -113,7 +113,7 @@ defmodule BatchProcessCoordination.BatchKey do
     case query |> Repo.update_all(update, [returning: true]) do
       {0, []} ->
         Logger.info("#{__MODULE__}::release_batch_key Attempt to release unknown key; query: #{inspect(query)}")
-        {:not_found}
+        {:error, :not_found}
       {1, [%ProcessBatchKeys{
         external_id: external_id,
         key: key,
