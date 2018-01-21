@@ -3,6 +3,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessControllerTest do
 
   import Mox
 
+  alias BatchProcessCoordination.ProcessInfo
   alias BatchProcessCoordination.ProcessMock, as: Mock
 
   describe "ProcessController" do
@@ -30,7 +31,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessControllerTest do
 
     test "delete calls unregister_process on existing process_name", %{conn: conn} do
       process_name = "#{__MODULE__}:DeleteProcess"
-      process_info = %{process_name: process_name, key_space_size: 247}
+      process_info = %ProcessInfo{process_name: process_name, key_space_size: 247}
       Mock |> expect(:unregister_process, fn pn -> assert pn === process_name; {:ok, process_info} end)
       conn = delete(conn, process_path(conn, :delete, process_name))
       assert json_response(conn, :ok) == render_json("delete.json", %{process_info: process_info})
@@ -38,7 +39,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessControllerTest do
 
     test "post calls register_proceess for previously unregistered process name", %{conn: conn} do
       process_name = "#{__MODULE__}:PostProcess"
-      process_info = %{process_name: process_name, key_space_size: 10}
+      process_info = %ProcessInfo{process_name: process_name, key_space_size: 10}
       Mock |> expect(:register_process, fn pn -> assert pn === process_name; {:ok, process_info} end)
       conn = post(conn, process_path(conn, :create, %{process_name: process_name}))
       assert json_response(conn, :created) == render_json("create.json", %{process_info: process_info})
