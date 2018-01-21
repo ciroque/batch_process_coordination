@@ -20,6 +20,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyController do
       |> render("create.json", %{batch_key: batch_key})
     end
   end
+  def create(conn, _), do: {:error, "proces_name and machine are required."}
 
   def delete(conn, %{"external_id" => external_id}) do
     with {:ok, %BatchKeyInfo{} = batch_key} <- @batch_key__impl.release_batch_key(external_id) do

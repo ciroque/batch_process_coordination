@@ -28,6 +28,11 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyControllerTest do
       assert json_response(conn, :ok) == render_json("index.json", %{batch_keys: batch_keys})
     end
 
+    test "post disallows empty body", %{conn: conn} do
+      conn = post(conn, batch_key_path(conn, :create, %{}))
+      assert json_response(conn, :unprocessable_entity) == format_json_api_error("proces_name and machine are required.")
+    end
+
     test "post calls request_batch_key for unregistered process name", %{conn: conn} do
       process_name = "#{__MODULE__}::PostProcess"
       machine = "#{__MODULE__}::PostMachine"
