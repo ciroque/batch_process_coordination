@@ -10,7 +10,7 @@ defmodule BatchProcessCoordination.BatchKeyInfo do
     started_at: Timex.DateTime.t
   }
 
-  @enforce_keys [:key, :last_completed_at, :process_name]
+  @enforce_keys [:process_name]
 
   defstruct [
     :external_id,

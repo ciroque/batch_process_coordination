@@ -3,6 +3,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyControllerTest do
 
   import Mox
 
+  alias BatchProcessCoordination.BatchKeyInfo
   alias BatchProcessCoordination.BatchKeyMock, as: Mock
 
   describe "BatchKeyController" do
@@ -18,8 +19,8 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyControllerTest do
     test "index calls list_batch_keys for registered process name", %{conn: conn} do
       process_name = "#{__MODULE__}::IndexProcess"
       batch_keys = [
-        %{last_completed_at: nil, external_id: nil, key: 0, machine: nil, process_name: process_name, started_at: nil},
-        %{last_completed_at: nil, external_id: nil, key: 1, machine: nil, process_name: process_name, started_at: nil}
+        %BatchKeyInfo{last_completed_at: nil, external_id: nil, key: 0, machine: nil, process_name: process_name, started_at: nil},
+        %BatchKeyInfo{last_completed_at: nil, external_id: nil, key: 1, machine: nil, process_name: process_name, started_at: nil}
       ]
 
       Mock |> expect(:list_batch_keys, fn pn -> assert pn === process_name; {:ok, batch_keys} end)
@@ -46,7 +47,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyControllerTest do
     test "post calls request_batch_key for registered process name", %{conn: conn} do
       process_name = "#{__MODULE__}::PostProcess"
       machine = "#{__MODULE__}::PostMachine"
-      batch_key = %{last_completed_at: nil, external_id: "SOME-GUID", key: 0, machine: machine, process_name: process_name, started_at: nil}
+      batch_key = %BatchKeyInfo{last_completed_at: nil, external_id: "SOME-GUID", key: 0, machine: machine, process_name: process_name, started_at: nil}
       Mock
       |> expect(
         :request_batch_key,
@@ -78,7 +79,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyControllerTest do
       process_name = "#{__MODULE__}::DeleteProcess"
       machine = "#{__MODULE__}::DeleteMachine"
       external_id = "6f6586f9-7b48-4a9e-adca-837f2058f4d5"
-      batch_key = %{last_completed_at: nil, external_id: external_id, key: 0, machine: machine, process_name: process_name, started_at: nil}
+      batch_key = %BatchKeyInfo{last_completed_at: nil, external_id: external_id, key: 0, machine: machine, process_name: process_name, started_at: nil}
       Mock |> expect(:release_batch_key, fn exid -> assert exid === external_id; {:ok, batch_key} end)
       conn = delete(conn, batch_key_path(conn, :delete, external_id))
       assert json_response(conn, :ok) == render_json("delete.json", %{batch_key: batch_key})

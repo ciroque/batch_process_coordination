@@ -1,6 +1,8 @@
 defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyController do
   use BatchProcessCoordinationWeb, :controller
 
+  alias BatchProcessCoordination.BatchKeyInfo
+
   @batch_key__impl Application.get_env(:batch_process_coordination, :batch_key__impl)
 
   action_fallback(BatchProcessCoordinationWeb.FallbackController)
@@ -13,7 +15,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyController do
 
   def create(conn, %{"process_name" => process_name, "machine" => machine}) do
     case @batch_key__impl.request_batch_key(process_name, machine) do
-      {:ok, batch_key} ->
+      {:ok, %BatchKeyInfo{} = batch_key} ->
         conn
         |> put_status(:created)
         |> render("create.json", %{batch_key: batch_key})
@@ -28,7 +30,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyController do
 
   def delete(conn, %{"external_id" => external_id}) do
     case @batch_key__impl.release_batch_key(external_id) do
-      {:ok, batch_key} ->
+      {:ok, %BatchKeyInfo{} = batch_key} ->
         conn |> render("delete.json", %{batch_key: batch_key})
       {:not_found} ->
         {:error, :not_found}
