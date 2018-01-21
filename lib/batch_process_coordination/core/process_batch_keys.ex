@@ -3,12 +3,12 @@ defmodule BatchProcessCoordination.ProcessBatchKeys do
   import Ecto.Changeset
 
   schema "process_batch_keys" do
-    field :process_name, :string
-    field :key, :integer
-    field :machine, :string
-    field :started_at, :utc_datetime
-    field :last_completed_at, :utc_datetime
     field :external_id, :string
+    field :key, :integer
+    field :last_completed_at, :utc_datetime
+    field :machine, :string
+    field :process_name, :string
+    field :started_at, :utc_datetime
 
     timestamps()
   end
