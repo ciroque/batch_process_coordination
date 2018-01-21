@@ -1,10 +1,10 @@
-FROM bitwalker/alpine-elixir-phoenix AS BUILD_STEP
+FROM elixir:1.5.1-slim AS BUILD_STEP
 
 ENV MIX_ENV=prod
 
-COPY . .
-
 WORKDIR /opt/app
+
+COPY . .
 
 RUN mix local.hex --force \
   && mix local.rebar --force \
