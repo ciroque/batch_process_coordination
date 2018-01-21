@@ -1,39 +1,177 @@
-# batch_process_coordination
-Maintains keys to help coordinate parallel processes.
+# Batch Process Coordination Service
 
-## Routes
+## Overview
 
-### Processes
+A service to help coordinate concurrent batch processing. The service maintains a set of keys that can be acquired by a
+processor. The exact semantics are left to the application making use of the service.
 
-#### Retrieve registered process names and their key space size
+The inspiration came from an implementation that used the batch key as a modulo test against the integer id field from a
+database table.
 
-GET /api/v1/process
+## Service Details
 
-#### Register a new batch process
+### Routes
 
-POST /api/v1/process
+The service provides two routes, one to manage the registered processes, the second to manage the batch keys.
 
-Body: {"name": <process_name>, "key_space": <size>}
+#### Processes
+
+##### Retrieve registered processes and their key space size
+
+Request:
+
+`GET /api/v1/process`
+
+Response:
+
+```json
+  [
+    {
+      "process_name": string,
+      "key_set_size": integer
+    },
+    ...,
+    {
+      "process_name": string,
+      "key_set_size": integer
+    }
+  ]
+```
+
+##### Register a new batch process
+
+Request:
+
+`POST /api/v1/process`
+
+Body: 
   
-size defaults to 10.
+```json
+  {
+    "process_name": string,
+    "key_set_size": integer
+  }
+```
 
-#### Unregister Process
+_process_name_ is the name of the batch process that is to be created.
 
-DELETE /api/v1/process/<process_name>
+_key_set_size_ is the size of the key space (i.e.: the number of keys available), defaults to *10*.
 
-### Batch Keys
+Response:
 
-#### Request a Batch Key for a process:
+```json
+  {
+    "process_name": string,
+    "key_space_size": integer
+  }
+```
 
-POST /api/v1/process/batch_keys
+##### Unregister Process
 
-Body: {"process_name": <process name>, "machine": <machine name>}
+Request:
 
-#### Release a Batch Key for a process:
+`DELETE /api/v1/process/<process_name>`
 
-DELETE /api/v1/process/batch_keys/<process_name>/key
+Response:
 
-#### Retrieve current Batch Key state for a process:
+```json
+  {
+    "process_name": string,
+    "key_set_size": integer
+  }
+```
 
-GET /api/v1/process/batch_keys/<process_name>
+#### Batch Keys
+
+##### Retrieve current Batch Key state for a process:
+
+Request:
+
+`GET /api/v1/process/batch_keys/<process_name>`
+
+Response:
+
+````json
+  [
+    {
+      "external_id": UUID,
+      "key": integer,
+      "last_completed_at": datetime,
+      "machine": string,
+      "process_name": string,
+      "started_at": datetime
+    },
+    ...,
+    {
+      "external_id": UUID,
+      "key": integer,
+      "last_completed_at": datetime,
+      "machine": string,
+      "process_name": string,
+      "started_at": datetime
+    }
+  ]
+````
+
+##### Request a Batch Key for a process:
+
+Request:
+
+`POST /api/v1/process/batch_keys`
+
+Body:
+
+```json
+  {
+    "process_name": string, 
+    "machine": string
+  }
+```
+
+_process_name_ is the name of the batch process for which a key is being requested.
+
+_machine_ is the name of the host to which the key will be assigned. The actual value can be any arbitrary string. Using
+duplicates has no effect on the service.
+
+Response:
+
+```json
+  {
+    "external_id": UUID,
+    "key": integer,
+    "last_completed_at": datetime,
+    "machine": string,
+    "process_name": string,
+    "started_at": datetime
+  }
+```
+
+##### Release a Batch Key for a process:
+
+Request:
+
+`DELETE /api/v1/process/batch_keys/<external_id>`
+
+Response:
+
+````json
+  {
+    "external_id": UUID,
+    "key": integer,
+    "last_completed_at": datetime,
+    "machine": string,
+    "process_name": string,
+    "started_at": datetime
+  }
+````
+
+
+
+## Installation
+
+### Docker
+
+### Installer
+
+
 
