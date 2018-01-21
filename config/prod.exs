@@ -1,8 +1,9 @@
 use Mix.Config
 
 config :batch_process_coordination, BatchProcessCoordinationWeb.Endpoint,
-  on_init: {Exertrax.Web.Endpoint, :load_from_system_env, []},
-  http: [port: {:system, "BPC_PORT"}, ip: {0,0,0,0}]
+  load_from_system_env: true,
+  http: [port: {:system, "BPC_PORT"}, ip: {0,0,0,0}],
+  server: true
 
 config :logger, level: :info
 
