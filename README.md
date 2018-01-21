@@ -27,13 +27,12 @@ Response:
 ```json
   [
     {
-      "process_name": string,
-      "key_set_size": integer
+      "process_name": "process-name",
+      "key_set_size": 0
     },
-    ...,
     {
-      "process_name": string,
-      "key_set_size": integer
+      "process_name": "process-name",
+      "key_set_size": 0
     }
   ]
 ```
@@ -48,8 +47,8 @@ Body:
   
 ```json
   {
-    "process_name": string,
-    "key_set_size": integer
+    "process_name": "process-name",
+    "key_set_size": 0
   }
 ```
 
@@ -61,8 +60,8 @@ Response:
 
 ```json
   {
-    "process_name": string,
-    "key_space_size": integer
+    "process_name": "process-name",
+    "key_space_size": 0
   }
 ```
 
@@ -76,8 +75,8 @@ Response:
 
 ```json
   {
-    "process_name": string,
-    "key_set_size": integer
+    "process_name": "process-name",
+    "key_set_size": 0
   }
 ```
 
@@ -94,21 +93,20 @@ Response:
 ````json
   [
     {
-      "external_id": UUID,
-      "key": integer,
-      "last_completed_at": datetime,
-      "machine": string,
-      "process_name": string,
-      "started_at": datetime
+      "external_id": "d4c55731-7c2e-48ac-b5db-6a5933ac8b9c",
+      "key": 0,
+      "last_completed_at": "2018-01-21 03:23:22.061203",
+      "machine": "machine",
+      "process_name": "process_name",
+      "started_at": "2018-01-21 05:47:09.914996"
     },
-    ...,
     {
-      "external_id": UUID,
-      "key": integer,
-      "last_completed_at": datetime,
-      "machine": string,
-      "process_name": string,
-      "started_at": datetime
+      "external_id": "6982c9b0-1fde-4839-ac4b-186f77345014",
+      "key": 1,
+      "last_completed_at": "2018-01-21 03:24:21.506564",
+      "machine": "machine-2",
+      "process_name": "process_name",
+      "started_at": "2018-01-21 05:47:10.842902"
     }
   ]
 ````
@@ -123,8 +121,8 @@ Body:
 
 ```json
   {
-    "process_name": string, 
-    "machine": string
+    "process_name": "process_name", 
+    "machine": "machine"
   }
 ```
 
@@ -137,12 +135,12 @@ Response:
 
 ```json
   {
-    "external_id": UUID,
-    "key": integer,
-    "last_completed_at": datetime,
-    "machine": string,
-    "process_name": string,
-    "started_at": datetime
+    "external_id": "b608a696-7197-42b1-bbbd-cabb962cbaad",
+    "key": 0,
+    "last_completed_at": "2018-01-20 03:20:16.020479",
+    "machine": "machine",
+    "process_name": "process_name",
+    "started_at": "2018-01-21 05:47:07.046923"
   }
 ```
 
@@ -156,22 +154,26 @@ Response:
 
 ````json
   {
-    "external_id": UUID,
-    "key": integer,
-    "last_completed_at": datetime,
-    "machine": string,
-    "process_name": string,
-    "started_at": datetime
+    "external_id": "519afed1-54a3-428e-a03f-dc2907b24f42",
+    "key": 0,
+    "last_completed_at": "2018-01-21 03:28:35.860540",
+    "machine": "machine",
+    "process_name": "process_name",
+    "started_at": "2018-01-21 05:47:13.957722"
   }
 ````
-
-
 
 ## Installation
 
 ### Docker
 
+Batch Process Coordinator is available on [Docker](https://hub.docker.com/r/ciroque/batch_process_coordination/ "Batch Process Coordination on Docker Hub")
+
+Pull the latest image using:
+
+`docker pull ciroque/batch_process_coordination`
+
 ### Installer
 
-
+WIP
 
