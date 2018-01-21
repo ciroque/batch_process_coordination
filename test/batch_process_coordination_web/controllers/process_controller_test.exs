@@ -25,7 +25,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessControllerTest do
 
     test "delete calls unregister_process and renders not found", %{conn: conn} do
       process_name = "#{__MODULE__}:DeleteProcess"
-      Mock |> expect(:unregister_process, fn pn -> assert pn === process_name; {:not_found} end)
+      Mock |> expect(:unregister_process, fn pn -> assert pn === process_name; {:error, :not_found} end)
       conn = delete(conn, process_path(conn, :delete, process_name))
       assert json_response(conn, :not_found) == render_json(BatchProcessCoordinationWeb.ErrorView, "404.json", %{})
     end

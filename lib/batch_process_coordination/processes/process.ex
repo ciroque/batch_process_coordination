@@ -29,7 +29,7 @@ defmodule BatchProcessCoordination.Process do
       process_name_exists(process_name) ->
         delete_process_key_space(process_name)
       true ->
-        {:not_found}
+        {:error, :not_found}
     end
   end
 

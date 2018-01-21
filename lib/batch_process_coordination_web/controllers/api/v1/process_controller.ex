@@ -16,13 +16,8 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessController do
   end
 
   def delete(conn, %{"id" => process_name}) do
-    case @process__impl.unregister_process(process_name) do
-      {:ok, %ProcessInfo{} = process_info} ->
-        conn |> render("delete.json", %{process_info: process_info})
-      {:not_found} -> ## WTF doesn't ErrorView work??
-        conn
-        |> put_status(:not_found)
-        |> render(BatchProcessCoordinationWeb.ErrorView, "404.json", %{})
+    with {:ok, %ProcessInfo{} = process_info} <- @process__impl.unregister_process(process_name) do
+      conn |> render("delete.json", %{process_info: process_info})
     end
   end
 

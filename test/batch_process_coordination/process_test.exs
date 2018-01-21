@@ -29,7 +29,7 @@ defmodule BatchProcessCoordination.ProcessTest do
     end
 
     test "Unregister unknown Process returns :not_found" do
-      {:not_found} = Process.unregister_process("UNKNOWN")
+      {:error, :not_found} = Process.unregister_process("UNKNOWN")
     end
 
     test "Unregister Process deletes all batch keys" do
