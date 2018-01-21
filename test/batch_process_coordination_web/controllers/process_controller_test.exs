@@ -3,6 +3,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessControllerTest do
 
   import Mox
 
+  alias BatchProcessCoordinationWeb.ErrorHelpers
   alias BatchProcessCoordination.ProcessInfo
   alias BatchProcessCoordination.ProcessMock, as: Mock
 
@@ -45,12 +46,30 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessControllerTest do
       assert json_response(conn, :created) == render_json("create.json", %{process_info: process_info})
     end
 
+    test "post calls register_proceess with empty process name, no bueno", %{conn: conn} do
+      process_name = ""
+      error_message = "process_name cannot be an empty string."
+      error = {:error, error_message}
+      Mock |> expect(:register_process, fn pn -> assert pn === process_name; error end)
+      conn = post(conn, process_path(conn, :create, %{process_name: process_name}))
+      assert json_response(conn, :unprocessable_entity) == format_json_api_error(error_message)
+    end
+
     test "post calls register_proceess for previously registered process name", %{conn: conn} do
       process_name = "#{__MODULE__}:PostProcess"
-      Mock |> expect(:register_process, fn pn -> assert pn === process_name; {:name_already_exists} end)
+      error_message = "process_name '#{process_name}' already exists."
+      error = {:error, error_message}
+      Mock |> expect(:register_process, fn pn -> assert pn === process_name; error end)
       conn = post(conn, process_path(conn, :create, %{process_name: process_name}))
-      assert json_response(conn, :unprocessable_entity) == render_json("name_already_exists.json", %{process_name: process_name})
+      assert json_response(conn, :unprocessable_entity) == format_json_api_error(error_message)
     end
+  end
+
+  defp format_json_api_error(detail) do
+    detail
+    |> ErrorHelpers.build_json_api_error
+    |> Poison.encode!
+    |> Poison.decode!
   end
 
   defp render_json(template, assigns) do

@@ -14,7 +14,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessView do
   end
 
   def render("name_already_exists.json", %{process_name: process_name}) do
-    %{errors: %{detail: "Process name already exists", process_name: process_name}}
+    %{errors: [%{detail: "Process name already exists", process_name: process_name}]}
   end
 
   def render("process_info.json", %{process: process_info}) do

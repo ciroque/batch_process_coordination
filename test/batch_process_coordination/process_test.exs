@@ -10,11 +10,11 @@ defmodule BatchProcessCoordination.ProcessTest do
     end
 
     test "Register Process disallows empty string as process_name" do
-      assert {:error, %{detail: "process_name cannot be an empty string."}} == Process.register_process("")
+      assert {:error, "process_name cannot be an empty string."} == Process.register_process("")
     end
 
     test "Register Process disallows nil as process_name" do
-      assert {:error, %{detail: "process_name cannot be an empty string."}} == Process.register_process(nil)
+      assert {:error, "process_name cannot be an empty string."} == Process.register_process(nil)
     end
 
     test "Register Process creates all batch keys with default key space" do
@@ -54,9 +54,9 @@ defmodule BatchProcessCoordination.ProcessTest do
       ]}
     end
 
-    test "regstering duplicate process_name is disallowed" do
+    test "registering duplicate process_name is disallowed" do
       {:ok, _} =  Process.register_process("NO-DUPLICATES-ALLOWED")
-      {:name_already_exists} = Process.register_process("NO-DUPLICATES-ALLOWED")
+      assert {:error, "process_name 'NO-DUPLICATES-ALLOWED' already exists."} == Process.register_process("NO-DUPLICATES-ALLOWED")
     end
   end
 end

@@ -2,7 +2,12 @@ defmodule BatchProcessCoordinationWeb.ErrorView do
   use BatchProcessCoordinationWeb, :view
 
   def render("404.json", _assigns) do
-    %{errors: [%{detail: "Not found"}]}
+#    %{errors: [%{detail: "Not found"}]}
+    build_json_api_error("Not found")
+  end
+
+  def render("422.json", %{detail: detail}) do
+    build_json_api_error(detail)
   end
 
   def render("500.json", _assigns) do

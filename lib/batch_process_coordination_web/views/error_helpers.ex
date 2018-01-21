@@ -3,6 +3,15 @@ defmodule BatchProcessCoordinationWeb.ErrorHelpers do
   Conveniences for translating and building error messages.
   """
 
+  def build_json_api_error(detail) when is_binary(detail) do
+    %{errors: [%{detail: detail}]}
+  end
+
+  def build_json_api_error(detail) when is_list(detail) do
+    details = detail |> Enum.map(&(%{detail: &1}))
+    %{errors: details}
+  end
+
   @doc """
   Translates an error message using gettext.
   """

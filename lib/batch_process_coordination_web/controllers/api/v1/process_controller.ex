@@ -1,21 +1,17 @@
 defmodule BatchProcessCoordinationWeb.Api.V1.ProcessController do
   use BatchProcessCoordinationWeb, :controller
 
+  action_fallback(BatchProcessCoordinationWeb.FallbackController)
+
   alias BatchProcessCoordination.ProcessInfo
 
   @process__impl Application.get_env(:batch_process_coordination, :process__impl)
 
   def create(conn, %{"process_name" => process_name}) do
-    case @process__impl.register_process(process_name) do
-      {:ok, %ProcessInfo{} = process_info} ->
-        conn
-        |> put_status(:created)
-        |> render("create.json", %{process_info: process_info})
-
-      {:name_already_exists} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render("name_already_exists.json", %{process_name: process_name})
+    with {:ok, %ProcessInfo{} = process_info} <- @process__impl.register_process(process_name) do
+      conn
+      |> put_status(:created)
+      |> render("create.json", %{process_info: process_info})
     end
   end
 

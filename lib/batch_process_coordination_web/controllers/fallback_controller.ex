@@ -18,10 +18,10 @@ defmodule BatchProcessCoordinationWeb.FallbackController do
     |> render(BatchProcessCoordinationWeb.ErrorView, :"404")
   end
 
-  def call(conn, {:error, message}) when is_binary(message) do
+  def call(conn, {:error, detail}) when is_binary(detail) do
     conn
     |> put_status(:unprocessable_entity)
-    |> assign(:message, message)
-    |> render(BatchProcessCoordinationWeb.ErrorView, :"422") # => json {"error" : "message"}
+    |> assign(:detail, detail)
+    |> render(BatchProcessCoordinationWeb.ErrorView, :"422")
   end
 end

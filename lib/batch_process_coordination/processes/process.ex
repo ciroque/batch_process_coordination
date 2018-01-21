@@ -10,15 +10,17 @@ defmodule BatchProcessCoordination.Process do
 
   def register_process(process_name, key_space_size \\ 10)
   def register_process(process_name, _key_space_size) when is_nil(process_name) do
-    {:error, %{detail: @process_name_cannot_be_empty}}
+    {:error, @process_name_cannot_be_empty}
   end
   def register_process("" = _process_name, _key_space_size) do
-    {:error, %{detail: @process_name_cannot_be_empty}}
+    {:error, @process_name_cannot_be_empty}
   end
   def register_process(process_name, key_space_size) do
     cond do
-      process_name_exists(process_name) -> {:name_already_exists}
-      true -> create_process_key_space(process_name, key_space_size)
+      process_name_exists(process_name) ->
+        {:error, "process_name '#{process_name}' already exists."}
+      true ->
+        create_process_key_space(process_name, key_space_size)
     end
   end
 
