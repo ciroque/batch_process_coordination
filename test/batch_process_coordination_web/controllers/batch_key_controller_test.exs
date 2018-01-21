@@ -71,7 +71,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.BatchKeyControllerTest do
 
     test "delete calls release_batch_key for unregistered process name", %{conn: conn} do
       external_id = "6f6586f9-7b48-4a9e-adca-837f2058f4d5"
-      Mock |> expect(:release_batch_key, fn exid -> assert exid === external_id; {:not_found} end)
+      Mock |> expect(:release_batch_key, fn exid -> assert exid === external_id; {:error, :not_found} end)
       conn = delete(conn, batch_key_path(conn, :delete, external_id))
       assert json_response(conn, :not_found) == render_json(BatchProcessCoordinationWeb.ErrorView, "404.json", %{})
     end
