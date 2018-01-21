@@ -14,6 +14,7 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessController do
       |> render("create.json", %{process_info: process_info})
     end
   end
+  def create(_conn, _), do: {:error, "process_name cannot be empty."}
 
   def delete(conn, %{"id" => process_name}) do
     with {:ok, %ProcessInfo{} = process_info} <- @process__impl.unregister_process(process_name) do

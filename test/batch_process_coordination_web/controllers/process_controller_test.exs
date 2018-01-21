@@ -37,6 +37,16 @@ defmodule BatchProcessCoordinationWeb.Api.V1.ProcessControllerTest do
       assert json_response(conn, :ok) == render_json("delete.json", %{process_info: process_info})
     end
 
+    test "post disallows empty body", %{conn: conn} do
+      conn = post(conn, process_path(conn, :create, %{}))
+      assert json_response(conn, :unprocessable_entity) == format_json_api_error("process_name cannot be empty.")
+    end
+
+    test "post disallows missing process_name", %{conn: conn} do
+      conn = post(conn, process_path(conn, :create, %{"and_now_for": "something completely different"}))
+      assert json_response(conn, :unprocessable_entity) == format_json_api_error("process_name cannot be empty.")
+    end
+
     test "post calls register_proceess for previously unregistered process name", %{conn: conn} do
       process_name = "#{__MODULE__}:PostProcess"
       process_info = %ProcessInfo{process_name: process_name, key_space_size: 10}
