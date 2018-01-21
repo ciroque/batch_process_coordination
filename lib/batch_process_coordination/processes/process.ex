@@ -4,8 +4,7 @@ defmodule BatchProcessCoordination.Process do
   import BatchProcessCoordination.Helpers
   import Ecto.Query
 
-  alias BatchProcessCoordination.ProcessBatchKeys
-  alias BatchProcessCoordination.Repo
+  alias BatchProcessCoordination.{ProcessBatchKeys, ProcessInfo, Repo}
 
   def register_process(process_name, key_space_size \\ 10) do
     cond do
@@ -27,7 +26,7 @@ defmodule BatchProcessCoordination.Process do
     processes = (
       from pm in ProcessBatchKeys,
       group_by: pm.process_name,
-      select: %{
+      select: %ProcessInfo{
         process_name: pm.process_name,
         key_space_size: count(pm.id)
       }
@@ -48,13 +47,13 @@ defmodule BatchProcessCoordination.Process do
       |> Repo.insert()
     end
 
-    {:ok, %{process_name: process_name, key_space_size: length(batch_keys)}}
+    {:ok, %ProcessInfo{process_name: process_name, key_space_size: length(batch_keys)}}
   end
 
   defp delete_process_key_space(process_name) do
     {count, _} = (from pm in ProcessBatchKeys, where: pm.process_name == ^process_name)
-                 |> Repo.delete_all()
+    |> Repo.delete_all()
 
-    {:ok, %{process_name: process_name, key_space_size: count}}
+    {:ok, %ProcessInfo{process_name: process_name, key_space_size: count}}
   end
 end

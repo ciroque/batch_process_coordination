@@ -2,10 +2,7 @@ defmodule BatchProcessCoordination.ProcessBehaviour do
   @type process_name_t :: String.t
   @type key_space_t :: integer()
 
-  @type process_info_t :: %{
-    process_name: String.t,
-    key_space_size: integer()
-  }
+  @type process_info_t :: BatchProcessCoordination.ProcessInfo.t
 
   @callback register_process(process_name_t)
     :: {:ok, process_info_t}

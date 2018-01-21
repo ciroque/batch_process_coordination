@@ -2,7 +2,7 @@ defmodule BatchProcessCoordination.ProcessTest do
   use BatchProcessCoordination.DataCase
 
 
-  alias BatchProcessCoordination.{Process, Repo}
+  alias BatchProcessCoordination.{Process, ProcessInfo, Repo}
 
   describe "Process" do
     def setup do
@@ -25,7 +25,7 @@ defmodule BatchProcessCoordination.ProcessTest do
     end
 
     test "Unregister Process deletes all batch keys" do
-      {:ok, %{key_space_size: registered_key_space_size}} =  Process.register_process("test one process")
+      {:ok, %ProcessInfo{key_space_size: registered_key_space_size}} =  Process.register_process("test one process")
       {:ok, %{key_space_size: unregistered_key_space_size}} = Process.unregister_process("test one process")
       assert registered_key_space_size === unregistered_key_space_size
     end
@@ -40,9 +40,9 @@ defmodule BatchProcessCoordination.ProcessTest do
       {:ok, _} = Process.register_process("three", 23)
 
       assert Process.list_processes() == {:ok, [
-        %{key_space_size: 23, process_name: "three"},
-        %{key_space_size: 7, process_name: "two"},
-        %{key_space_size: 10, process_name: "one"},
+        %ProcessInfo{key_space_size: 23, process_name: "three"},
+        %ProcessInfo{key_space_size: 7, process_name: "two"},
+        %ProcessInfo{key_space_size: 10, process_name: "one"},
       ]}
     end
 
