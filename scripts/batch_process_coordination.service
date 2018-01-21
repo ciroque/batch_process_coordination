@@ -10,6 +10,7 @@ Environment=PORT=9197
 ExecStartPre=-/usr/bin/docker stop %n
 ExecStartPre=-/usr/bin/docker rm %n
 ExecStartPre=/usr/bin/docker pull ciroque/batch_process_coordination
-ExecStart=/bin/sh -c "/usr/bin/docker run --rm --name batch_process_coordination -e PORT=9199 --add-host=database-host:$(ifconfig | grep -A 1 'bond0' | tail -1 | cut -d ':' -f 2 | cut -d ' ' -f 1) -p 0.0.0.0:9199:9199 ciroque/batch_process_coordination"
+ExecStart=/bin/sh -c "/usr/bin/docker run --rm --name batch_process_coordination -e BPC_PORT=9009 -e PORT=9009 --add-host=database-host:$(ifconfig | grep -A 1 'bond0' | tail -1 | cut -d ':' -f 2 | cut -d ' ' -f 1) -p 0.0.0.0:9009:9009 ciroque/batch_process_coordination"
+
 [Install]
 WantedBy=multi-user.target
