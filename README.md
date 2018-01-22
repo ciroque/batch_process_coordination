@@ -177,6 +177,10 @@ Response:
 
 ## Installation
 
+## Database
+
+The [structure.sql](https://raw.githubusercontent.com/ciroque/batch_process_coordination/master/priv/repo/structure.sql) file can be used to initialize the database.
+
 ### Docker
 
 Batch Process Coordinator is available on [Docker](https://hub.docker.com/r/ciroque/batch_process_coordination/ "Batch Process Coordination on Docker Hub")
@@ -184,6 +188,15 @@ Batch Process Coordinator is available on [Docker](https://hub.docker.com/r/ciro
 Pull the latest image using:
 
 `docker pull ciroque/batch_process_coordination`
+
+The container must be provided with the name of the database server.  This entails using the `--add-host=database-host:` parameter to `docker run`.
+Check the [batch_process_coordination.service](https://raw.githubusercontent.com/ciroque/batch_process_coordination/master/scripts/batch_process_coordination.service) file for an example.
+
+On systems that utilize systemd this script can be copied to `/lib/systemd/system` and used to control the service. 
+
+To ensure the service is restarted and autostarted using systemd:
+
+`sudo systemctl enable batch_process_coordination.service`
 
 ### Installer
 
