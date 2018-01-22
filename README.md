@@ -37,6 +37,10 @@ Response:
   ]
 ```
 
+_process_name_ is the name of the batch process that is to be created.
+
+_key_set_size_ is the size of the key space (i.e.: the number of keys available), defaults to *10*.
+
 ##### Register a new batch process
 
 Request:
@@ -51,10 +55,6 @@ Body:
     "key_set_size": 0
   }
 ```
-
-_process_name_ is the name of the batch process that is to be created.
-
-_key_set_size_ is the size of the key space (i.e.: the number of keys available), defaults to *10*.
 
 Response:
 
@@ -110,6 +110,18 @@ Response:
     }
   ]
 ````
+
+_external_id_ (uuid string) A unique id to be used when releasing the batch key; *null* if the key is not currently locked.
+
+_key_ (integer) The unique numeric value to be used by the handler to distinguish work load from other handlers.
+
+_last_completed_at_ (datetime) The date and time this key was last used and handled successfully.
+
+_machine_ (string) Arbitrary identifier for the host / instance / container / etc handling the key; *null* is the key is not currently locked.
+
+_process_name_ (string) The process name.
+
+_started_at_ (datetime) The date and time the key was locked; *null* if the key is not currently locked.
 
 ##### Request a Batch Key for a process:
 
