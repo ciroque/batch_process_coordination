@@ -3,7 +3,7 @@
 ## Overview
 
 A service to help coordinate concurrent batch processing. The service maintains a set of keys that can be acquired by a
-processor. The exact semantics are left to the application making use of the service.
+handler. The exact semantics are left to the application making use of the service.
 
 The inspiration came from an implementation that used the batch key as a modulo test against the integer id field from a
 database table.
@@ -37,9 +37,9 @@ Response:
   ]
 ```
 
-_**process_name**_ (string) The name of the batch process that is to be created.
+_**process_name**_ (string) The name of the batch process to be created.
 
-_**key_set_size**_ (string) The size of the key space (i.e.: the number of keys available), defaults to *10*.
+_**key_set_size**_ (integer) The size of the key space (i.e.: the number of keys available), defaults to *10*.
 
 ##### Register a new batch process
 
@@ -138,9 +138,9 @@ Body:
   }
 ```
 
-_**process_name**_ is the name of the batch process for which a key is being requested.
+_**process_name**_ (string) is the name of the batch process for which a key is being requested.
 
-_**machine**_ is the name of the host to which the key will be assigned. The actual value can be any arbitrary string. Using
+_**machine**_ (string) is the name of the host to which the key will be assigned. The actual value can be any arbitrary string. Using
 duplicates has no effect on the service.
 
 Response:
@@ -189,10 +189,10 @@ Pull the latest image using:
 
 `docker pull ciroque/batch_process_coordination`
 
-The container must be provided with the name of the database server.  This entails using the `--add-host=database-host:` parameter to `docker run`.
+The the name of the database server must be provided to the container.  This can be done with the `--add-host=database-host:` parameter to `docker run`.
 Check the [batch_process_coordination.service](https://raw.githubusercontent.com/ciroque/batch_process_coordination/master/scripts/batch_process_coordination.service) file for an example.
 
-On systems that utilize systemd this script can be copied to `/lib/systemd/system` and used to control the service. 
+On systems that utilize **systemd** this script can be copied to `/lib/systemd/system` and used to control the service. 
 
 To ensure the service is restarted and autostarted using systemd:
 
