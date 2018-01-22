@@ -37,9 +37,9 @@ Response:
   ]
 ```
 
-_process_name_ is the name of the batch process that is to be created.
+_*process_name*_ is the name of the batch process that is to be created.
 
-_key_set_size_ is the size of the key space (i.e.: the number of keys available), defaults to *10*.
+_*key_set_size*_ is the size of the key space (i.e.: the number of keys available), defaults to *10*.
 
 ##### Register a new batch process
 
@@ -111,17 +111,17 @@ Response:
   ]
 ````
 
-_external_id_ (uuid string) A unique id to be used when releasing the batch key; *null* if the key is not currently locked.
+_*external_id*_ (uuid string) A unique id to be used when releasing the batch key; *null* if the key is not currently locked.
 
-_key_ (integer) The unique numeric value to be used by the handler to distinguish work load from other handlers.
+_*key*_ (integer) The unique numeric value to be used by the handler to distinguish work load from other handlers.
 
-_last_completed_at_ (datetime) The date and time this key was last used and handled successfully.
+_*last_completed_at*_ (datetime) The date and time this key was last used and handled successfully.
 
-_machine_ (string) Arbitrary identifier for the host / instance / container / etc handling the key; *null* is the key is not currently locked.
+_*machine*_ (string) Arbitrary identifier for the host / instance / container / etc handling the key; *null* is the key is not currently locked.
 
-_process_name_ (string) The process name.
+_*process_name*_ (string) The process name.
 
-_started_at_ (datetime) The date and time the key was locked; *null* if the key is not currently locked.
+_*started_at*_ (datetime) The date and time the key was locked; *null* if the key is not currently locked.
 
 ##### Request a Batch Key for a process:
 
@@ -138,9 +138,9 @@ Body:
   }
 ```
 
-_process_name_ is the name of the batch process for which a key is being requested.
+_*process_name*_ is the name of the batch process for which a key is being requested.
 
-_machine_ is the name of the host to which the key will be assigned. The actual value can be any arbitrary string. Using
+_*machine*_ is the name of the host to which the key will be assigned. The actual value can be any arbitrary string. Using
 duplicates has no effect on the service.
 
 Response:
