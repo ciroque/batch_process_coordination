@@ -37,9 +37,9 @@ Response:
   ]
 ```
 
-_***process_name**_ is the name of the batch process that is to be created.
+_**process_name**_ is the name of the batch process that is to be created.
 
-_***key_set_size**_ is the size of the key space (i.e.: the number of keys available), defaults to *10*.
+_**key_set_size**_ is the size of the key space (i.e.: the number of keys available), defaults to *10*.
 
 ##### Register a new batch process
 
