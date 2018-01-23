@@ -1,4 +1,4 @@
-FROM elixir:1.5.1-slim AS BUILD_STEP
+FROM elixir:1.6-slim AS BUILD_STEP
 
 ENV MIX_ENV=prod
 
@@ -21,7 +21,7 @@ RUN find . -name *.tar.gz
 ## #####################################################################################################################
 ## Release
 
-FROM elixir:1.5.1-slim
+FROM elixir:1.6-slim
 
 EXPOSE 4000
 ENV PORT=4000 \
